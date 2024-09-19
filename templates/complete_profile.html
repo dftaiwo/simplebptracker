@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Complete Your Profile - {{ config['APP_NAME'] }}{% endblock %}
+
+{% block content %}
+<div class="row mt-5">
+  <div class="col-lg-6 mx-auto">
+    <h4>Complete Your Profile</h4>
+    <p>To ensure we are able to provide you with the best possible readings and interpretations, we need to collect a little information about you.</p>
+    <form method="POST" id="profile-form">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name or nickname" required value="{{ user.name }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Gender</label>
+            <div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gender" id="male" value="male" required {% if user.gender == 'male' %}checked{% endif %}>
+                    <label class="form-check-label" for="male">Male</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gender" id="female" value="female" required {% if user.gender == 'female' %}checked{% endif %}>
+                    <label class="form-check-label" for="female">Female</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="gender" id="other" value="other" required {% if user.gender == 'other' %}checked{% endif %}>
+                    <label class="form-check-label" for="other">I'd Rather Not Say</label>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="year_of_birth" class="form-label">Year of Birth</label>
+            <input type="number" class="form-control" id="year_of_birth" name="year_of_birth" placeholder="Enter your year of birth" required value="{{ user.year_of_birth }}" min="1900" max="{{ current_year }}">
+        </div>
+        <div class="mb-3">
+            <label for="height" class="form-label">Height (cm)</label>
+            <input type="number" step="0.1" class="form-control" id="height" name="height" placeholder="Enter your height in cm" required value="{{ user.height }}" min="50" max="300">
+        </div>
+        <div class="mb-3">
+            <label for="weight" class="form-label">Weight (kg)</label>
+            <input type="number" step="0.1" class="form-control" id="weight" name="weight" placeholder="Enter your weight in kg" required value="{{ user.weight }}" min="20" max="500">
+        </div>
+        <div class="mb-3">
+            <label for="occupation" class="form-label">Occupation</label>
+            <input type="text" class="form-control" id="occupation" name="occupation" placeholder="Enter your occupation" value="{{ user.occupation }}">
+        </div>
+        <div class="mb-3">
+            <label for="activity_level" class="form-label">Primary Activity Level</label>
+            <select class="form-select" id="activity_level" name="activity_level" required>
+                <option value="" disabled selected>Select your activity level</option>
+                <option value="sedentary" {% if user.activity_level == 'sedentary' %}selected{% endif %}>Sedentary</option>
+                <option value="light" {% if user.activity_level == 'light' %}selected{% endif %}>Light Activity</option>
+                <option value="moderate" {% if user.activity_level == 'moderate' %}selected{% endif %}>Moderate Activity</option>
+                <option value="heavy" {% if user.activity_level == 'heavy' %}selected{% endif %}>Heavy Activity</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Complete Profile</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('profile-form');
+    form.addEventListener('submit', function(event) {
+        let isValid = true;
+        const currentYear = new Date().getFullYear();
+
+        // Name validation
+        const name = document.getElementById('name');
+        if (!name.value.trim()) {
+            isValid = false;
+            name.classList.add('is-invalid');
+        } else {
+            name.classList.remove('is-invalid');
+        }
+
+        // Year of Birth validation
+        const yearOfBirth = document.getElementById('year_of_birth');
+        if (yearOfBirth.value < 1900 || yearOfBirth.value > currentYear) {
+            isValid = false;
+            yearOfBirth.classList.add('is-invalid');
+        } else {
+            yearOfBirth.classList.remove('is-invalid');
+        }
+
+        // Height validation
+        const height = document.getElementById('height');
+        if (height.value < 50 || height.value > 300) {
+            isValid = false;
+            height.classList.add('is-invalid');
+        } else {
+            height.classList.remove('is-invalid');
+        }
+
+        // Weight validation
+        const weight = document.getElementById('weight');
+        if (weight.value < 20 || weight.value > 500) {
+            isValid = false;
+            weight.classList.add('is-invalid');
+        } else {
+            weight.classList.remove('is-invalid');
+        }
+
+        // Activity Level validation
+        const activityLevel = document.getElementById('activity_level');
+        if (activityLevel.value === "") {
+            isValid = false;
+            activityLevel.classList.add('is-invalid');
+        } else {
+            activityLevel.classList.remove('is-invalid');
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

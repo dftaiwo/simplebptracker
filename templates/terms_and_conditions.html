@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Terms and Conditions - {{ config['APP_NAME'] }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>Terms and Conditions</h3>
+    <p>Last updated: September 16, 2024    </p>
+    
+    <h4>1. Agreement to Terms</h4>
+    <p>By accessing or using {{ config['APP_NAME'] }}, you agree to be bound by these Terms and Conditions and our Privacy Policy.</p>
+    
+    <h4>2. Description of Service</h4>
+    <p>{{ config['APP_NAME'] }} is a blood pressure tracking application that allows users to record and monitor their blood pressure readings over time.</p>
+    
+    <h4>3. User Responsibilities</h4>
+    <p>You are responsible for:</p>
+    <ul>
+        <li>Maintaining the confidentiality of your account</li>
+        <li>Providing accurate and up-to-date information</li>
+        <li>Using the service in compliance with all applicable laws and regulations</li>
+    </ul>
+    
+    <h4>4. Medical Disclaimer</h4>
+    <p>{{ config['APP_NAME'] }} is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.</p>
+    
+    <h4>5. Intellectual Property</h4>
+    <p>The service and its original content, features, and functionality are owned by {{ config['APP_NAME'] }} and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.</p>
+    
+    <h4>6. Termination</h4>
+    <p>We may terminate or suspend your account and bar access to the service immediately, without prior notice or liability, under our sole discretion, for any reason whatsoever and without limitation, including but not limited to a breach of the Terms.</p>
+    
+    <h4>7. Limitation of Liability</h4>
+    <p>In no event shall {{ config['APP_NAME'] }}, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the service.</p>
+    
+    <h4>8. Changes to Terms</h4>
+    <p>We reserve the right to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days' notice prior to any new terms taking effect.</p>
+    
+    <h4>9. Contact Us</h4>
+    <p>If you have any questions about these Terms, please contact us at: [Your Contact Information]</p>
+</div>
+{% endblock %}

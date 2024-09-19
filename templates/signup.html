@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{{ config['APP_NAME'] }} - Sign Up{% endblock %}
+
+{% block content %}
+<div class="row mt-5">
+  <div class="col-lg-6">
+
+                <h2>Sign Up</h2>
+                <form action="{{ url_for('signup') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </form>
+            
+    <hr />
+  </div>
+</div>
+{% endblock %}

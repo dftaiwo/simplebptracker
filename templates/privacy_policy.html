@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy - {{ config['APP_NAME'] }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Privacy Policy</h1>
+    <p>Last updated: {{ current_date }}</p>
+    
+    <h2>1. Introduction</h2>
+    <p>Welcome to {{ config['APP_NAME'] }}. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data and tell you about your privacy rights and how the law protects you.</p>
+    
+    <h2>2. Data We Collect</h2>
+    <p>We collect and process the following data:</p>
+    <ul>
+        <li>Personal identification information (Name, email address)</li>
+        <li>Health-related data (Blood pressure readings, pulse rate)</li>
+        <li>Profile information (Gender, year of birth, height, weight, occupation, activity level)</li>
+    </ul>
+    
+    <h2>3. How We Use Your Data</h2>
+    <p>We use your data to:</p>
+    <ul>
+        <li>Provide and maintain our service</li>
+        <li>Track and analyze your blood pressure readings</li>
+        <li>Improve our service</li>
+        <li>Communicate with you</li>
+    </ul>
+    
+    <h2>4. Data Security</h2>
+    <p>We implement appropriate technical and organizational measures to protect your personal data against unauthorized or unlawful processing, accidental loss, destruction or damage.</p>
+    
+    <h2>5. Your Rights</h2>
+    <p>You have the right to:</p>
+    <ul>
+        <li>Access your personal data</li>
+        <li>Correct inaccurate personal data</li>
+        <li>Request erasure of your personal data</li>
+        <li>Object to processing of your personal data</li>
+        <li>Request restriction of processing your personal data</li>
+        <li>Request transfer of your personal data</li>
+        <li>Withdraw consent</li>
+    </ul>
+    
+    <h2>6. Changes to This Privacy Policy</h2>
+    <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p>
+    
+    <h2>7. Contact Us</h2>
+    <p>If you have any questions about this Privacy Policy, please contact us at: [Your Contact Information]</p>
+</div>
+{% endblock %}

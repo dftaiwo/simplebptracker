@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}MyBpMonitor - Home{% endblock %}
+
+{% block content %}
+<div class="row mt-5">
+  <div class="col-lg-6">
+    <form action="{{ url_for('signin') }}" method="POST" enctype="multipart/form-data">
+      <div>
+        <input type="email" name="email" class="form-control" placeholder="Email" required value="dftaiwoadis@gmail.com" />
+      </div>
+      &nbsp;
+      <div>
+        <button type="submit" class="btn btn-primary">Send Magic Link</button>
+      </div>
+    </form>
+    <hr />
+  </div>
+</div>
+{% endblock %}
+
+

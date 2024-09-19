@@ -1,0 +1,28 @@
+.pull-right {
+    float: right;
+}
+
+.text-right{
+    text-align: right;
+}
+
+.nav-item .active {
+    font-weight: bold;
+    color: #007bff;
+}
+
+h5{
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.navbar-brand{
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #007bff;
+}
+.navbar-brand:hover{
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #0038cc;
+}
