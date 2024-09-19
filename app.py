@@ -29,6 +29,7 @@ from io import BytesIO, StringIO
 import csv
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
+import random
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -536,6 +537,7 @@ def new_reading():
 def my_readings():
     try:
         user_id = session['user_id']
+        total_readings = BloodPressureReading.query.filter_by(user_id=user_id).count()
         page = request.args.get('page', 1, type=int)
         per_page = 25  # Number of readings per page
 
@@ -551,6 +553,7 @@ def my_readings():
 
         return render_template('my_readings.html', readings=readings, timestamps=timestamps,
                                systolic_values=systolic_values, diastolic_values=diastolic_values,
+                               total_readings=total_readings,
                                pagination=pagination)
     except Exception as e:
         app.logger.error(f"Error in my_readings: {str(e)}")
@@ -658,6 +661,101 @@ def export_readings():
             download_name=download_file_name
     )
     
+import random
+from datetime import datetime, timedelta
+
+def generate_random_readings():
+    user_id = session['user_id']
+    current_date = datetime.now().date()
+    readings = []
+    
+    # Initial values
+    last_systolic = random.randint(110, 125)
+    last_diastolic = random.randint(70, 80)
+    last_pulse = random.randint(60, 75)
+    
+    # Trend factors (slight upward or downward trend)
+    systolic_trend = random.uniform(-0.1, 0.1)
+    diastolic_trend = random.uniform(-0.05, 0.05)
+    pulse_trend = random.uniform(-0.05, 0.05)
+
+    for day in range(65):
+        reading_date = current_date - timedelta(days=day)
+        
+        # Randomly choose morning or evening
+        if random.choice([True, False]):
+            # Morning reading (5:20 AM to 6:40 AM)
+            hour = random.randint(5, 6)
+            minute = random.randint(20, 59) if hour == 5 else random.randint(0, 40)
+        else:
+            # Evening reading (6:00 PM to 8:55 PM)
+            hour = random.randint(18, 20)
+            minute = random.randint(0, 55)
+        
+        reading_time = datetime.combine(reading_date, datetime.min.time().replace(hour=hour, minute=minute))
+        
+        # Generate new readings with small variations from the last reading
+        systolic = max(90, min(150, int(last_systolic + random.gauss(0, 3) + systolic_trend)))
+        diastolic = max(60, min(100, int(last_diastolic + random.gauss(0, 2) + diastolic_trend)))
+        pulse = max(50, min(100, int(last_pulse + random.gauss(0, 2) + pulse_trend)))
+        
+        # Ensure diastolic is always lower than systolic
+        diastolic = min(diastolic, systolic - 30)
+        
+        # Occasional spikes (about 5% chance)
+        if random.random() < 0.05:
+            systolic += random.randint(5, 15)
+            diastolic += random.randint(3, 10)
+            pulse += random.randint(5, 15)
+        
+        reading = BloodPressureReading(
+            user_id=user_id,
+            systolic=systolic,
+            diastolic=diastolic,
+            pulse=pulse,
+            timestamp=reading_time,
+            reading_type_id=1,  # Assuming 1 is for manual entry
+            analysis_status_id=1,  # Default value
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
+        readings.append(reading)
+        
+        # Update last values for the next iteration
+        last_systolic = systolic
+        last_diastolic = diastolic
+        last_pulse = pulse
+    
+    return readings
+
+@app.route('/generate_random_readings')
+@login_required
+def generate_random_readings_route():
+    try:
+        readings = generate_random_readings()
+        db.session.bulk_save_objects(readings)
+        db.session.commit()
+        flash('Sample data generated and saved successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error generating and saving sample data: {str(e)}', 'danger')
+    
+    return redirect(url_for('dashboard'))
+
+@app.route('/clear_readings')
+@login_required
+def clear_readings():
+    user_id = session['user_id']
+    try:
+        # Delete all readings for the user
+        BloodPressureReading.query.filter_by(user_id=user_id).delete()
+        db.session.commit()
+        flash('All your readings have been cleared successfully.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred while clearing your readings: {str(e)}', 'danger')
+    return redirect(url_for('dashboard'))
+
 # Initialize database
 if __name__ == "__main__":
     # Before running the app, ensure the database file exists
