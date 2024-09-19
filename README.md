@@ -2,7 +2,7 @@
 
 ## Overview
 
-Blood Pressure Tracker is an experiemental web application that allows users to monitor and track their blood pressure readings over time. It provides a user-friendly interface for logging readings, viewing trends, and gaining insights into cardiovascular health. It's not intended for clinical use, but rather as a personal project to explore and showcase Gemini's capabilities.
+Blood Pressure Tracker is an experiemental web application that allows users to monitor and track their blood pressure readings over time. It provides a user-friendly interface for logging readings, viewing trends, and gaining insights into cardiovascular health. It's not intended for clinical use, but rather as a personal project to explore and begin to showcase Gemini's capabilities.
 
 ## Demo Application
 
@@ -14,13 +14,13 @@ You can access a live demo of the application at https://mybp.d4devs.com/
 - Dashboard with recent readings and statistics
 - Ability to add new blood pressure readings 
 - Ability to upload an image of your BP reading 
-- View all historical readings
+- View all historical readings and export to CSV
 - Graphical representation of blood pressure trends
 - 30-day average calculations
 
 ## Technologies Used
 
-- Python
+- Python (3.9+)
 - Flask (Web Framework)
 - SQLAlchemy (ORM)
 - HTML/CSS
@@ -71,6 +71,8 @@ You can access a live demo of the application at https://mybp.d4devs.com/
 
 5. Initialize the database:
    ```
+   flask db init
+   flask db migrate
    flask db upgrade
    ```
 
