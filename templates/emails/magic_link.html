@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Magic Link</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #cae5f7;
+            color: #000;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .button:link {
+            color: #000;
+        }
+        .footer {
+            margin-top: 20px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to {{ app_name }}</h1>
+        <p>Hello,</p>
+        <p>You've requested a magic link to sign in to your account. Click the button below to complete your sign-in:</p>
+        <a href="{{ magic_link }}" class="button">Sign In</a>
+        <p>If you didn't request this link, you can safely ignore this email.</p>
+        <p>This link will expire in 1 hour for security reasons.</p>
+        <div class="footer">
+            <p>Best regards,<br><a href="{{ base_url }}">The {{ app_name }} Team</a></p>
+        </div>
+    </div>
+</body>
+</html>

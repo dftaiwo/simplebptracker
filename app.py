@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, send_file
+from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, send_file, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from werkzeug.utils import secure_filename
 import smtplib
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import ssl
 import imaplib
 from email.message import EmailMessage
@@ -47,7 +48,7 @@ model = genai.GenerativeModel('gemini-1.5-flash')
 app = Flask(__name__)
 
 # Add this line to set the app name
-app.config['APP_NAME'] = 'Simple BP Tracker'
+app.config['APP_NAME'] = os.getenv('APP_NAME', 'Simple BP Tracker')
 
 # Configuration for SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bp_tracker.db'
@@ -189,29 +190,24 @@ def magic_link_sent():
     
     return render_template('magic_link_sent.html', email=email, email_provider_url=email_provider_url)
 
-def send_email_old(subject, body, recipients):
-    try:
-        msg = Message(subject, 
-                      sender=(app.config['APP_NAME'], app.config['MAIL_USERNAME']),
-                      recipients=recipients)
-        msg.body = body
-        mail.send(msg)
-        print("Email sent successfully!")
-    except Exception as e:
-        print(f"Error sending email: {str(e)}")
-        raise
-
-    print("Email process completed!")
-
 def send_email(subject, body, email):
     try:
         sender = app.config['MAIL_USERNAME']
         password = app.config['MAIL_PASSWORD']
-        msg = MIMEText(body)
+        
+        msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
         msg['From'] = f"{app.config['APP_NAME']} <{app.config['MAIL_EMAIL']}>"
-        
         msg['To'] = email
+
+        # Plain text version of the email
+        text_part = MIMEText(body, 'plain')
+        msg.attach(text_part)
+
+        # HTML version of the email
+        html_part = MIMEText(body, 'html')
+        msg.attach(html_part)
+
         with smtplib.SMTP_SSL(app.config['MAIL_SERVER'], app.config['MAIL_PORT']) as smtp_server:
             smtp_server.login(sender, password)
             smtp_server.sendmail(app.config['MAIL_EMAIL'], email, msg.as_string())
@@ -220,8 +216,16 @@ def send_email(subject, body, email):
         print(f"Error sending email: {str(e)}")
         raise
 
+def get_base_url():
+    return request.url_root.rstrip('/')
 
-# Function to send magic link via email
+def generate_magic_email_html(magic_link):
+    base_url = get_base_url()
+    return render_template('emails/magic_link.html', 
+                           magic_link=magic_link, 
+                           app_name=app.config['APP_NAME'],
+                           base_url=base_url)
+
 def send_magic_link(email):
     try:
         user = User.query.filter_by(email=email).first()
@@ -234,8 +238,8 @@ def send_magic_link(email):
         # Check if email settings are configured
         if app.config['MAIL_SERVER'] and app.config['MAIL_USERNAME'] and app.config['MAIL_PASSWORD']:
             subject = f'Your Magic Link to {app.config["APP_NAME"]}'
-            body = f'Click on the link to sign in: {magic_link}'
-            send_email(subject, body, email)
+            html_body = generate_magic_email_html(magic_link)
+            send_email(subject, html_body, email)
             flash('A magic link has been sent to your email. Please check your inbox to sign in.', 'success')
         else:
             # If email settings are not configured, display the magic link directly
