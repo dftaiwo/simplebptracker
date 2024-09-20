@@ -1,21 +1,56 @@
 {% extends "base.html" %}
 
-{% block title %}MyBpMonitor - Home{% endblock %}
+{% block title %}Welcome to {{ config['APP_NAME'] }}{% endblock %}
 
 {% block content %}
-<div class="row mt-5">
-  <div class="col-lg-6">
-    <form action="{{ url_for('signin') }}" method="POST" enctype="multipart/form-data">
-      <div>
-        <input type="email" name="email" class="form-control" placeholder="Enter Your Email to Sign up or Sign in" required />
-      </div>
-      &nbsp;
-      <div>
-        <button type="submit" class="btn btn-primary">Send Magic Link</button>
-      </div>
-    </form>
-    <hr />
-  </div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">About {{ config['APP_NAME'] }}</h5>
+                    <p class="card-text">
+                        {{ config['APP_NAME'] }} is an experimental web application designed to help you monitor and track your blood pressure readings over time. Our user-friendly interface allows you to easily log readings, view trends, and gain insights into your cardiovascular health.
+                    </p>
+                    <p class="card-text">
+                        <strong>Please note:</strong> This app is not intended for clinical use. It's a personal project to explore and showcase AI capabilities in health tracking.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">What to Expect</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Easy-to-use dashboard with recent readings and statistics</li>
+                        <li class="list-group-item">Add new blood pressure readings manually or by uploading an image</li>
+                        <li class="list-group-item">View all historical readings and export to CSV</li>
+                        <li class="list-group-item">Graphical representation of your blood pressure trends</li>
+                        <li class="list-group-item">30-day average calculations to track your progress</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="text-censter">
+                <h5 class="mb-3">Get Started</h5>
+                <div class="row">
+                <div class="col-lg-5">
+                <form action="{{ url_for('signin') }}" method="post">
+                    <div class="mb-3">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Sign In / Sign Up</button>
+                </form>
+              </div>
+              </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="https://github.com/dftaiwo/blood-pressure-tracker" class="btn btn-link" target="_blank">View Source Code on GitHub</a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
