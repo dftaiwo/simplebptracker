@@ -679,7 +679,7 @@ def generate_random_readings():
     diastolic_trend = random.uniform(-0.05, 0.05)
     pulse_trend = random.uniform(-0.05, 0.05)
 
-    for day in range(65):
+    for day in range(45):
         reading_date = current_date - timedelta(days=day)
         
         # Randomly choose morning or evening
@@ -742,7 +742,7 @@ def generate_random_readings_route():
     
     return redirect(url_for('dashboard'))
 
-@app.route('/clear_readings')
+@app.route('/clear_readings', methods=['POST'])
 @login_required
 def clear_readings():
     user_id = session['user_id']
