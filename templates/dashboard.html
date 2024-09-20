@@ -21,6 +21,7 @@
                 <p class="mb-0">Ready to get started? Add your first reading now!</p>
             </div>
             <a href="{{ url_for('new_reading') }}" class="btn btn-primary">Add Your First Reading</a>
+            <a href="{{ url_for('generate_random_readings_route') }}" class="btn btn-secondary">Generate Sample Data</a>
             </div>
             {% else %}
             <div class="row mt-4">
@@ -85,8 +86,6 @@
         
     </div>
 </div>
-
-{% if total_readings > 0 %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 $(document).ready(function() {
@@ -130,5 +129,4 @@ $(document).ready(function() {
     });
 });
 </script>
-{% endif %}
 {% endblock %}
