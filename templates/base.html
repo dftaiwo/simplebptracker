@@ -72,10 +72,10 @@
     <footer class="footer mt-auto py-3 bg-light">
       <div class="container">
         <div class="row">
-          <div class="col-md-6 text-center text-md-start">
-            <span class="text-muted">{{ config['APP_NAME'] }} &copy; {{ current_year }}</span>
+          <div class="col-md-6 text-center text-md-start ">
+            <span class="text-muted">{{ config['APP_NAME'] }}</span>
           </div>
-          <div class="col-md-6 text-center text-md-end">
+          <div class="col-md-6 text-center text-md-end hidden">
             <a href="{{ url_for('privacy_policy') }}" class="text-muted me-2">Privacy Policy</a>
             <a href="{{ url_for('terms_and_conditions') }}" class="text-muted">Terms & Conditions</a>
           </div>

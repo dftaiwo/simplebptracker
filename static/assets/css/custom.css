@@ -26,3 +26,7 @@ h5{
     font-size: 1.1rem;
     color: #0038cc;
 }
+
+.hidden{
+    display: none;
+}
