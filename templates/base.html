@@ -1,8 +1,25 @@
 <!DOCTYPE html>
-<html class="h-100">
+<html class="h-100" lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Mini AI Experiment - Simple BP Tracker - Monitor and analyze your blood pressure readings easily">
+    <meta name="keywords" content="blood pressure, health, tracking, monitoring, medical">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:title" content="{% block og_title %}{{ config['APP_NAME'] }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Mini AI Experiment - Monitor and analyze your blood pressure readings easily with Simple BP Tracker{% endblock %}">
+    <meta property="og:image" content="{{ url_for('static', filename='assets/images/og-image.jpg', _external=True) }}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.url }}">
+    <meta property="twitter:title" content="{% block twitter_title %}{{ config['APP_NAME'] }}{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}Mini AI Experiment - Monitor and analyze your blood pressure readings easily with Simple BP Tracker{% endblock %}">
+    <meta property="twitter:image" content="{{ url_for('static', filename='assets/images/og-image.jpg', _external=True) }}">
+
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
     <link rel="stylesheet" href="/static/assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/static/assets/css/custom.css" />
@@ -10,7 +27,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <title>{% block title %}{{ config['APP_NAME'] }}{% endblock %}</title>
-    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}" />
     <style>
       body {
         display: flex;
