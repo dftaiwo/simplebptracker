@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, send_file, request, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, send_file, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
@@ -15,7 +15,7 @@ from email.message import EmailMessage
 import os
 import secrets
 from datetime import datetime, timedelta
-from models import User, BloodPressureReading, db
+from models import User, BloodPressureReading, db, BloodPressureAnalysis
 import base64
 from dotenv import load_dotenv
 from werkzeug.exceptions import RequestEntityTooLarge
@@ -31,9 +31,8 @@ import csv
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 import random
-from markupsafe import Markup, escape
-from celery import Celery
-import html
+from markupsafe import  escape
+from flask_caching import Cache
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -772,33 +771,40 @@ def clear_readings():
 @login_required
 def analyze_readings():
     user = User.query.get(session['user_id'])
+    if not user.profile_completed:
+        flash('Please complete your profile before doing this.', 'info')
+        return redirect(url_for('complete_profile'))
+
     readings = BloodPressureReading.query.filter_by(user_id=user.id).order_by(BloodPressureReading.timestamp.desc()).all()
     
     if not readings:
         flash('You need to have at least one reading to perform analysis.', 'warning')
         return redirect(url_for('dashboard'))
 
-    # Check cache first
-    cache_key = f"analysis_{user.id}"
-    cached_analysis = cache.get(cache_key)
-    if cached_analysis:
-        return render_template('analysis_results.html', analysis=cached_analysis)
+    # Get the current count of readings
+    current_readings_count = len(readings)
+
+    # Check if there's a recent analysis
+    recent_analysis = BloodPressureAnalysis.query.filter_by(user_id=user.id).order_by(BloodPressureAnalysis.created_at.desc()).first()
+    if recent_analysis and recent_analysis.readings_count == current_readings_count:
+        return render_template('analysis_results.html', analysis=recent_analysis.analysis_text)
 
     # Prepare user profile and readings data
     user_profile = f"""
-    User Profile:
-    Name: {user.name}
-    Gender: {user.gender}
-    Age: {datetime.now().year - user.year_of_birth}
-    Height: {user.height} cm
-    Weight: {user.weight} kg
-    Occupation: {user.occupation}
-    Activity Level: {user.activity_level}
+    <h5>User Profile:</h5>
+    <p><strong>Name:</strong> {user.name}</p>
+    <p><strong>Gender:</strong> {user.gender}</p>
+    <p><strong>Age:</strong> {datetime.now().year - user.year_of_birth}</p>
+    <p><strong>Height:</strong> {user.height} cm</p>
+    <p><strong>Weight:</strong> {user.weight} kg</p>
+    <p><strong>Occupation:</strong> {user.occupation}</p>
+    <p><strong>Activity Level:</strong> {user.activity_level}</p>
     """
 
-    readings_data = "Blood Pressure Readings:\n"
+    readings_data = "<h3>Blood Pressure Readings:</h3><ul>"
     for reading in readings:
-        readings_data += f"Date: {reading.timestamp}, Systolic: {reading.systolic}, Diastolic: {reading.diastolic}, Pulse: {reading.pulse}\n"
+        readings_data += f"<li>Date: {reading.timestamp}, Systolic: {reading.systolic}, Diastolic: {reading.diastolic}, Pulse: {reading.pulse}</li>"
+    readings_data += "</ul>"
 
     # Prepare the prompt for Gemini
     prompt = f"""
@@ -813,45 +819,48 @@ def analyze_readings():
 
     {readings_data}
 
-    Please provide your analysis in a clear, concise manner suitable for a non-medical professional to understand.
-    Use HTML formatting for headers, bold text, and lists.
+    Please provide your analysis in HTML format, using appropriate tags for headers (h5), paragraphs, and lists. Use <strong> tags to highlight important points.
     """
 
-    # Start the background task
-    task = generate_analysis.delay(user.id, prompt)
-    
-    return render_template('analysis_loading.html', task_id=task.id)
+    try:
+        # Generate content using Gemini
+        response = model.generate_content(prompt)
+        analysis_html = format_analysis_html(response.text)
+        
+        # Store the analysis in the database
+        new_analysis = BloodPressureAnalysis(user_id=user.id, analysis_text=analysis_html, readings_count=current_readings_count)
+        db.session.add(new_analysis)
+        db.session.commit()
 
-@app.route('/analysis_status/<task_id>')
-@login_required
-def analysis_status(task_id):
-    task = generate_analysis.AsyncResult(task_id)
-    if task.state == 'PENDING':
-        response = {
-            'state': task.state,
-            'status': 'Analysis is pending...'
-        }
-    elif task.state != 'FAILURE':
-        response = {
-            'state': task.state,
-            'status': 'Analysis is in progress...'
-        }
-        if task.info:
-            response['result'] = task.info
-    else:
-        response = {
-            'state': task.state,
-            'status': 'Analysis failed',
-            'error': str(task.info)
-        }
-    return jsonify(response)
+        return render_template('analysis_results.html', analysis=analysis_html)
+    except Exception as e:
+        flash(f'An error occurred during analysis: {str(e)}', 'danger')
+        return redirect(url_for('dashboard'))
+
+
+
+def format_analysis_html(text):
+       # Convert headers
+       text = re.sub(r'^# (.*?)$', r'<h2 class="text-primary">\1</h2>', text, flags=re.MULTILINE)
+       text = re.sub(r'^## (.*?)$', r'<h3 class="text-secondary">\1</h3>', text, flags=re.MULTILINE)
+       
+       # Convert bold text
+       text = re.sub(r'\*\*(.*?)\*\*', r'<strong class="text-danger">\1</strong>', text)
+       
+       # Convert lists
+       text = re.sub(r'^\* (.*?)$', r'<li>\1</li>', text, flags=re.MULTILINE)
+       text = '<ul>' + text + '</ul>'
+       
+       # Convert line breaks
+    #    text = text.replace('\n', '<br>')
+       
+       return text
 
 # Add this custom filter definition before the route definitions
 @app.template_filter('nl2br')
 def nl2br_filter(s):
-    if not isinstance(s, str):
-        s = str(s)
-    return Markup(s.replace('\n', '<br>\n'))
+       return s;
+       return escape(s).replace('\n', '<br>\n')
 
 # Initialize database
 if __name__ == "__main__":
