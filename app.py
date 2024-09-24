@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, send_file, request
+from flask import Flask, render_template, request, redirect, url_for, session, flash, abort, send_file, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
@@ -31,6 +31,9 @@ import csv
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 import random
+from markupsafe import Markup, escape
+from celery import Celery
+import html
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -390,7 +393,7 @@ def complete_profile():
             user.profile_completed = True
             user.updated_at = datetime.utcnow()
             db.session.commit()
-            flash('Profile completed successfully!', 'success')
+            flash('Profile updated successfully!', 'success')
             return redirect(url_for('dashboard'))
         else:
             for field, error in errors.items():
@@ -425,6 +428,11 @@ def validate_bp_reading(systolic, diastolic, pulse):
 @app.route('/new_reading', methods=['GET', 'POST'])
 @login_required
 def new_reading():
+    user = User.query.get(session['user_id'])
+    if not user.profile_completed:
+        flash('Please complete your profile before adding a new reading.', 'info')
+        return redirect(url_for('complete_profile'))
+
     if request.method == 'POST':
         try:
             entry_method = request.form['entry_method']
@@ -759,6 +767,91 @@ def clear_readings():
         db.session.rollback()
         flash(f'An error occurred while clearing your readings: {str(e)}', 'danger')
     return redirect(url_for('dashboard'))
+
+@app.route('/analyze_readings')
+@login_required
+def analyze_readings():
+    user = User.query.get(session['user_id'])
+    readings = BloodPressureReading.query.filter_by(user_id=user.id).order_by(BloodPressureReading.timestamp.desc()).all()
+    
+    if not readings:
+        flash('You need to have at least one reading to perform analysis.', 'warning')
+        return redirect(url_for('dashboard'))
+
+    # Check cache first
+    cache_key = f"analysis_{user.id}"
+    cached_analysis = cache.get(cache_key)
+    if cached_analysis:
+        return render_template('analysis_results.html', analysis=cached_analysis)
+
+    # Prepare user profile and readings data
+    user_profile = f"""
+    User Profile:
+    Name: {user.name}
+    Gender: {user.gender}
+    Age: {datetime.now().year - user.year_of_birth}
+    Height: {user.height} cm
+    Weight: {user.weight} kg
+    Occupation: {user.occupation}
+    Activity Level: {user.activity_level}
+    """
+
+    readings_data = "Blood Pressure Readings:\n"
+    for reading in readings:
+        readings_data += f"Date: {reading.timestamp}, Systolic: {reading.systolic}, Diastolic: {reading.diastolic}, Pulse: {reading.pulse}\n"
+
+    # Prepare the prompt for Gemini
+    prompt = f"""
+    Analyze the following blood pressure readings and user profile. Provide a comprehensive analysis including:
+    1. Overall blood pressure trends
+    2. Identification of any concerning patterns or readings
+    3. Recommendations for lifestyle changes or improvements
+    4. Suggestions for follow-up actions (e.g., consult a doctor, increase monitoring frequency)
+    5. Any other relevant observations or insights
+
+    {user_profile}
+
+    {readings_data}
+
+    Please provide your analysis in a clear, concise manner suitable for a non-medical professional to understand.
+    Use HTML formatting for headers, bold text, and lists.
+    """
+
+    # Start the background task
+    task = generate_analysis.delay(user.id, prompt)
+    
+    return render_template('analysis_loading.html', task_id=task.id)
+
+@app.route('/analysis_status/<task_id>')
+@login_required
+def analysis_status(task_id):
+    task = generate_analysis.AsyncResult(task_id)
+    if task.state == 'PENDING':
+        response = {
+            'state': task.state,
+            'status': 'Analysis is pending...'
+        }
+    elif task.state != 'FAILURE':
+        response = {
+            'state': task.state,
+            'status': 'Analysis is in progress...'
+        }
+        if task.info:
+            response['result'] = task.info
+    else:
+        response = {
+            'state': task.state,
+            'status': 'Analysis failed',
+            'error': str(task.info)
+        }
+    return jsonify(response)
+
+# Add this custom filter definition before the route definitions
+@app.template_filter('nl2br')
+def nl2br_filter(s):
+    if not isinstance(s, str):
+        s = str(s)
+    return Markup(s.replace('\n', '<br>\n'))
 
 # Initialize database
 if __name__ == "__main__":
