@@ -33,6 +33,7 @@ from sqlalchemy import event
 import random
 from markupsafe import  escape
 from flask_caching import Cache
+import logging
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -681,9 +682,9 @@ def generate_random_readings():
     readings = []
     
     # Initial values
-    last_systolic = random.randint(110, 125)
+    last_systolic = random.randint(100, 122)
     last_diastolic = random.randint(70, 80)
-    last_pulse = random.randint(60, 75)
+    last_pulse = random.randint(60, 80)
     
     # Trend factors (slight upward or downward trend)
     systolic_trend = random.uniform(-0.1, 0.1)
@@ -753,7 +754,7 @@ def generate_random_readings_route():
     
     return redirect(url_for('dashboard'))
 
-@app.route('/clear_readings', methods=['POST'])
+@app.route('/clear_readings', methods=['POST','GET'])
 @login_required
 def clear_readings():
     user_id = session['user_id']
@@ -787,7 +788,7 @@ def analyze_readings():
     # Check if there's a recent analysis
     recent_analysis = BloodPressureAnalysis.query.filter_by(user_id=user.id).order_by(BloodPressureAnalysis.created_at.desc()).first()
     if recent_analysis and recent_analysis.readings_count == current_readings_count:
-        return render_template('analysis_results.html', analysis=recent_analysis.analysis_text)
+        return render_template('analysis_results.html', analysis=json.loads(recent_analysis.analysis_text))
 
     # Prepare user profile and readings data
     user_profile = f"""
@@ -814,55 +815,45 @@ def analyze_readings():
     3. Recommendations for lifestyle changes or improvements - json key is lifestyle_changes
     4. Suggestions for follow-up actions (e.g., consult a doctor, increase monitoring frequency) - json key is follow_up_actions
     5. Any other relevant observations or insights - json key is other_insights
-    
+    6. High level summary in one sentence - json key is summary
 
     {user_profile}
 
     {readings_data}
 
-    Please provide your analysis for each json_key in HTML format, using appropriate tags for headers (h5), paragraphs, and lists. Use <strong> tags to highlight important points.
+    Please provide your analysis in a json object and in the json object please include the json keys as the headers and the values as properly formatted  HTML format, using appropriate tags, paragraphs, and lists. Use <strong> tags to highlight important points. No headers for the sections.
+    
     """
 
     try:
         # Generate content using Gemini
         response = model.generate_content(prompt)
-        analysis_html = format_analysis_html(response.text)
+        # logging.debug(f"Gemini API response: {response.text}")
+        json_response = response.text.replace('```json', '').replace('```', '').strip()
+        
+        # Attempt to parse the response as JSON
+
+        try:
+            analysis_json = json.loads(json_response)
+        except json.JSONDecodeError:
+            flash('The analysis response is not in the expected format. Please try again later', 'danger')
+            return redirect(url_for('dashboard'))
         
         # Store the analysis in the database
-        new_analysis = BloodPressureAnalysis(user_id=user.id, analysis_text=analysis_html, readings_count=current_readings_count)
-        print(new_analysis)
+        new_analysis = BloodPressureAnalysis(user_id=user.id, analysis_text=json.dumps(analysis_json), readings_count=current_readings_count)
         db.session.add(new_analysis)
         db.session.commit()
 
-        return render_template('analysis_results.html', analysis=analysis_html)
+        return render_template('analysis_results.html', analysis=analysis_json)
     except Exception as e:
         flash(f'An error occurred during analysis: {str(e)}', 'danger')
         return redirect(url_for('dashboard'))
 
-
-
-def format_analysis_html(text):
-       # Convert headers
-       text = re.sub(r'^# (.*?)$', r'<h2 class="text-primary">\1</h2>', text, flags=re.MULTILINE)
-       text = re.sub(r'^## (.*?)$', r'<h3 class="text-secondary">\1</h3>', text, flags=re.MULTILINE)
-       
-       # Convert bold text
-       text = re.sub(r'\*\*(.*?)\*\*', r'<strong class="text-danger">\1</strong>', text)
-       
-       # Convert lists
-       text = re.sub(r'^\* (.*?)$', r'<li>\1</li>', text, flags=re.MULTILINE)
-       text = '<ul>' + text + '</ul>'
-       
-       # Convert line breaks
-    #    text = text.replace('\n', '<br>')
-       
-       return text
-
 # Add this custom filter definition before the route definitions
 @app.template_filter('nl2br')
 def nl2br_filter(s):
-       return s;
-       return escape(s).replace('\n', '<br>\n')
+    return s;
+    return escape(s).replace('\n', '<br>\n')
 
 # Initialize database
 if __name__ == "__main__":

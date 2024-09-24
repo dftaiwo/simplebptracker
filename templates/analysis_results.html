@@ -1,44 +1,52 @@
 {% extends "base.html" %}
 
 {% block content %}
-&nbsp;
-<div class="card">
-    <div class="card-header">
-        Blood Pressure Analysis Results by Gemini AI
-    </div>
-    <div class="card-body">
-        <div class="card-text" id="analysis-content">{{ analysis | safe }}</div>
+<div class="container mt-5">
+    <div class="header">Analysis Results by Gemini AI</div>
+    <div class="row">
+        <div class="col-md-12" id="analysis-content">
+            {% for key, value in analysis.items() %}
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="card-title">{{ key.replace('_', ' ').title() }}</h5>
+                </div>
+                <div class="card-body">
+                    {{ value|safe }}
+                </div>
+            </div>
+            {% endfor %}
+            <div class="mt-3">
+                <button class="btn btn-primary" onclick="copyAnalysis()">Copy Analysis</button>
+                <button class="btn btn-secondary" onclick="shareAnalysis()">Share Analysis</button>
+            </div>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-link mt-3">Back to Dashboard</a>
+            
+            <script>
+            function copyAnalysis() {
+                const analysisContent = document.getElementById('analysis-content').innerText;
+                navigator.clipboard.writeText(analysisContent).then(() => {
+                    alert('Analysis copied to clipboard!');
+                });
+            }
+            
+            function shareAnalysis() {
+                const analysisContent = document.getElementById('analysis-content').innerText;
+                const shareData = {
+                    title: 'Blood Pressure Analysis',
+                    text: analysisContent,
+                    url: window.location.href
+                };
+                
+                if (navigator.share) {
+                    navigator.share(shareData)
+                        .then(() => console.log('Shared successfully'))
+                        .catch((error) => console.log('Error sharing:', error));
+                } else {
+                    alert('Sharing is not supported on this browser. You can copy the analysis and share it manually.');
+                }
+            }
+            </script>
+        </div>
     </div>
 </div>
-<div class="mt-3">
-    <button class="btn btn-primary" onclick="copyAnalysis()">Copy Analysis</button>
-    <button class="btn btn-secondary" onclick="shareAnalysis()">Share Analysis</button>
-</div>
-<a href="{{ url_for('dashboard') }}" class="btn btn-link mt-3">Back to Dashboard</a>
-
-<script>
-function copyAnalysis() {
-    const analysisContent = document.getElementById('analysis-content').innerText;
-    navigator.clipboard.writeText(analysisContent).then(() => {
-        alert('Analysis copied to clipboard!');
-    });
-}
-
-function shareAnalysis() {
-    const analysisContent = document.getElementById('analysis-content').innerText;
-    const shareData = {
-        title: 'Blood Pressure Analysis',
-        text: analysisContent,
-        url: window.location.href
-    };
-    
-    if (navigator.share) {
-        navigator.share(shareData)
-            .then(() => console.log('Shared successfully'))
-            .catch((error) => console.log('Error sharing:', error));
-    } else {
-        alert('Sharing is not supported on this browser. You can copy the analysis and share it manually.');
-    }
-}
-</script>
 {% endblock %}
