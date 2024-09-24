@@ -809,17 +809,18 @@ def analyze_readings():
     # Prepare the prompt for Gemini
     prompt = f"""
     Analyze the following blood pressure readings and user profile. Provide a comprehensive analysis including:
-    1. Overall blood pressure trends
-    2. Identification of any concerning patterns or readings
-    3. Recommendations for lifestyle changes or improvements
-    4. Suggestions for follow-up actions (e.g., consult a doctor, increase monitoring frequency)
-    5. Any other relevant observations or insights
+    1. Overall blood pressure trends - json key is overall_blood_pressure_trends
+    2. Identification of any concerning patterns or readings - json key is concerning_patterns
+    3. Recommendations for lifestyle changes or improvements - json key is lifestyle_changes
+    4. Suggestions for follow-up actions (e.g., consult a doctor, increase monitoring frequency) - json key is follow_up_actions
+    5. Any other relevant observations or insights - json key is other_insights
+    
 
     {user_profile}
 
     {readings_data}
 
-    Please provide your analysis in HTML format, using appropriate tags for headers (h5), paragraphs, and lists. Use <strong> tags to highlight important points.
+    Please provide your analysis for each json_key in HTML format, using appropriate tags for headers (h5), paragraphs, and lists. Use <strong> tags to highlight important points.
     """
 
     try:
@@ -829,6 +830,7 @@ def analyze_readings():
         
         # Store the analysis in the database
         new_analysis = BloodPressureAnalysis(user_id=user.id, analysis_text=analysis_html, readings_count=current_readings_count)
+        print(new_analysis)
         db.session.add(new_analysis)
         db.session.commit()
 
