@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Blood Pressure Analysis Results</h1>
+&nbsp;
 <div class="card">
+    <div class="card-header">
+        Blood Pressure Analysis Results by Gemini AI
+    </div>
     <div class="card-body">
-        <h5 class="card-title">Gemini AI Analysis</h5>
         <div class="card-text" id="analysis-content">{{ analysis | safe }}</div>
     </div>
 </div>
