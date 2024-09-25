@@ -43,3 +43,9 @@ h5{
     box-shadow: 0 0 10px #eee;
     padding:8px 10px;
 }
+
+.reading-unit{
+    font-size: 0.8rem;
+    color: #777;
+    display:block;
+}

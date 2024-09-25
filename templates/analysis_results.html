@@ -15,11 +15,12 @@
                 </div>
             </div>
             {% endfor %}
-            <div class="mt-3">
+            <div class="mt-3 text-center">
                 <button class="btn btn-primary" onclick="copyAnalysis()">Copy Analysis</button>
-                <button class="btn btn-secondary" onclick="shareAnalysis()">Share Analysis</button>
+                <button class="btn btn-info" onclick="shareAnalysis()">Share Analysis</button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-dark">Back to Dashboard</a>
             </div>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-link mt-3">Back to Dashboard</a>
+            
             
             <script>
             function copyAnalysis() {

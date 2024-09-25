@@ -8,15 +8,14 @@ from werkzeug.utils import secure_filename
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import ssl
-import imaplib
 from email.message import EmailMessage
+import random
+from datetime import datetime, timedelta
+
 
 import os
-import secrets
 from datetime import datetime, timedelta
 from models import User, BloodPressureReading, db, BloodPressureAnalysis
-import base64
 from dotenv import load_dotenv
 from werkzeug.exceptions import RequestEntityTooLarge
 import re
@@ -32,8 +31,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy import event
 import random
 from markupsafe import  escape
-from flask_caching import Cache
-import logging
+
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -315,7 +313,8 @@ def dashboard():
     chart_data = db.session.query(
         func.date(BloodPressureReading.timestamp).label('date'),
         func.avg(BloodPressureReading.systolic).label('avg_systolic'),
-        func.avg(BloodPressureReading.diastolic).label('avg_diastolic')
+        func.avg(BloodPressureReading.diastolic).label('avg_diastolic'),
+        func.avg(BloodPressureReading.pulse).label('avg_pulse')
     ).filter(
         BloodPressureReading.user_id == user.id,
         BloodPressureReading.timestamp >= thirty_days_ago
@@ -324,11 +323,13 @@ def dashboard():
     dates = [entry.date if isinstance(entry.date, str) else entry.date.strftime('%Y-%m-%d') for entry in chart_data]
     systolic_data = [float(entry.avg_systolic) for entry in chart_data]
     diastolic_data = [float(entry.avg_diastolic) for entry in chart_data]
+    pulse_data = [float(entry.avg_pulse) for entry in chart_data]
 
     chart_json = json.dumps({
         'dates': dates,
         'systolic': systolic_data,
-        'diastolic': diastolic_data
+        'diastolic': diastolic_data,
+        'pulse': pulse_data
     })
     
     # Fetch the latest analysis summary if it exists
@@ -682,9 +683,7 @@ def export_readings():
             download_name=download_file_name
     )
     
-import random
-from datetime import datetime, timedelta
-
+    
 def generate_random_readings():
     user_id = session['user_id']
     current_date = datetime.now().date()
@@ -819,12 +818,13 @@ def analyze_readings():
     # Prepare the prompt for Gemini
     prompt = f"""
     Analyze the following blood pressure readings and user profile. Provide a comprehensive analysis including:
-    1. Overall blood pressure trends - json key is overall_blood_pressure_trends
-    2. Identification of any concerning patterns or readings - json key is concerning_patterns
-    3. Recommendations for lifestyle changes or improvements - json key is lifestyle_changes
-    4. Suggestions for follow-up actions (e.g., consult a doctor, increase monitoring frequency) - json key is follow_up_actions
-    5. Any other relevant observations or insights - json key is other_insights
-    6. High level summary in one sentence - json key is summary
+    1. High level summary for a non-medical person, easy to understand in one sentence, followed by another sentence with a recommendation on what to do next, if any - json key is summary
+    2. Overall blood pressure trends - json key is overall_blood_pressure_trends
+    3. Identification of any concerning patterns or readings - json key is concerning_patterns
+    4. Recommendations for lifestyle changes or improvements - json key is lifestyle_changes
+    5. Suggestions for follow-up actions (e.g., consult a doctor, increase monitoring frequency) - json key is follow_up_actions
+    6. Any other relevant observations or insights - json key is other_insights
+    
 
     {user_profile}
 
@@ -837,7 +837,7 @@ def analyze_readings():
     try:
         # Generate content using Gemini
         response = model.generate_content(prompt)
-        # logging.debug(f"Gemini API response: {response.text}")
+        
         json_response = response.text.replace('```json', '').replace('```', '').strip()
         
         # Attempt to parse the response as JSON

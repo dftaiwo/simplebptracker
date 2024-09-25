@@ -59,42 +59,71 @@
                         </table>
                     </div>
                     <div class="card-footer">
-                            <a href="{{ url_for('new_reading') }}" class="btn btn-primary">Add New Reading</a>
-                            <a href="{{ url_for('my_readings') }}" class="btn btn-secondary">View All Readings</a>
-                            <a href="{{ url_for('analyze_readings') }}" class="btn btn-info">View Analysis</a>
+                        <div class="btn-group">
+
+                            <a href="{{ url_for('new_reading') }}" class="btn btn-primary btn-block">Record Reading</a>
+                            <a href="{{ url_for('my_readings') }}" class="btn btn-secondary btn-block">View All Readings</a>
+                        
+                            <a href="{{ url_for('analyze_readings') }}" class="btn btn-info btn-block">View Analysis</a>
+                        </div>
                     </div>
                 </div>
                 </div>
                 
                 <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            30-Day Average
-                        </div>
+                    <div class="cards">
+                        {% if avg_readings.avg_systolic %}
                         <div class="card-body">
-
-                    
-                    {% if avg_readings.avg_systolic %}
-                    <p>Systolic: {{ avg_readings.avg_systolic|round(1) }}</p>
-                    <p>Diastolic: {{ avg_readings.avg_diastolic|round(1) }}</p>
-                    <p>Pulse: {{ avg_readings.avg_pulse|round(1) }}</p>
-                    {% else %}
-                    <p>No readings in the last 30 days.</p>
-                    {% endif %}
-                    
-                    <h5>Statistics</h5>
-                    <p>Total Readings: {{ total_readings }}</p>
-                    {% if recent_readings %}
+                            <div class="card">
+                                <div class="card-body">
+                                  <h5 class="card-title text-center">30-Day Average</h5>
+                                  <div class="row">
+                                    <div class="col-md-4">
+                                      <div class="card mb-3">
+                                        <div class="card-body text-center">
+                                          <h6 class="card-subtitle mb-2 text-muted">Systolic</h6>
+                                          <p class="card-text display-4">{{ avg_readings.avg_systolic|round(1) }}<span class="reading-unit">mmHg</span></p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="card mb-3">
+                                        <div class="card-body text-center">
+                                          <h6 class="card-subtitle mb-2 text-muted">Diastolic</h6>
+                                          <p class="card-text display-4">{{ avg_readings.avg_diastolic|round(1) }}<span class="reading-unit">mmHg</span></p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                      <div class="card mb-3">
+                                        <div class="card-body text-center">
+                                          <h6 class="card-subtitle mb-2 text-muted">Pulse</h6>
+                                          <p class="card-text display-4">{{ avg_readings.avg_pulse|round(1) }}<span class="reading-unit">bpm</span></p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <hr>
+                                  {% if recent_readings %}
                     <div id="analysis_summary">
-                        <strong>Recent Analysis</strong><br />
+                        <strong>Recent Analysis based on {{ total_readings }} readings</strong><br />
                         {% if analysis_summary %}
-                        {{ analysis_summary|safe }}
-                        <br />
+                        {{ analysis_summary|safe|trim }}
                         {% endif %}
-                        
                         <a href="{{ url_for('analyze_readings') }}">More Details</a>
+                        <br />
+                        &nbsp;
                     </div>
                     {% endif %}
+                                </div>
+                                
+                              </div>
+                              {% else %}
+                              <p>No readings in the last 30 days.</p>
+                              {% endif %}
+                    
+                    
+                    
                 </div>
             </div>
             </div>
@@ -135,6 +164,11 @@ $(document).ready(function() {
                 data: chartData.diastolic,
                 borderColor: 'rgb(54, 162, 235)',
                 tension: 0.1
+            }, {
+                label: 'Pulse',
+                data: chartData.pulse,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
             }]
         },
         options: {
@@ -144,7 +178,7 @@ $(document).ready(function() {
                     beginAtZero: false,
                     title: {
                         display: true,
-                        text: 'Blood Pressure (mmHg)'
+                        text: 'Blood Pressure (mmHg) / Pulse (bpm)'
                     }
                 },
                 x: {
