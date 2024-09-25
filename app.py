@@ -8,15 +8,14 @@ from werkzeug.utils import secure_filename
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import ssl
-import imaplib
 from email.message import EmailMessage
+import random
+from datetime import datetime, timedelta
+
 
 import os
-import secrets
 from datetime import datetime, timedelta
-from models import User, BloodPressureReading, db
-import base64
+from models import User, BloodPressureReading, db, BloodPressureAnalysis
 from dotenv import load_dotenv
 from werkzeug.exceptions import RequestEntityTooLarge
 import re
@@ -31,6 +30,8 @@ import csv
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 import random
+from markupsafe import  escape
+
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -305,34 +306,46 @@ def dashboard():
         BloodPressureReading.timestamp >= thirty_days_ago
     ).first()
     
+
+    
+
     # Prepare data for the chart
     chart_data = db.session.query(
         func.date(BloodPressureReading.timestamp).label('date'),
         func.avg(BloodPressureReading.systolic).label('avg_systolic'),
-        func.avg(BloodPressureReading.diastolic).label('avg_diastolic')
+        func.avg(BloodPressureReading.diastolic).label('avg_diastolic'),
+        func.avg(BloodPressureReading.pulse).label('avg_pulse')
     ).filter(
         BloodPressureReading.user_id == user.id,
         BloodPressureReading.timestamp >= thirty_days_ago
     ).group_by(func.date(BloodPressureReading.timestamp)).order_by('date').all()
 
-    # print([(entry.date, type(entry.date)) for entry in chart_data])
-
     dates = [entry.date if isinstance(entry.date, str) else entry.date.strftime('%Y-%m-%d') for entry in chart_data]
     systolic_data = [float(entry.avg_systolic) for entry in chart_data]
     diastolic_data = [float(entry.avg_diastolic) for entry in chart_data]
+    pulse_data = [float(entry.avg_pulse) for entry in chart_data]
 
     chart_json = json.dumps({
         'dates': dates,
         'systolic': systolic_data,
-        'diastolic': diastolic_data
+        'diastolic': diastolic_data,
+        'pulse': pulse_data
     })
+    
+    # Fetch the latest analysis summary if it exists
+    recent_analysis = BloodPressureAnalysis.query.filter_by(user_id=user.id).order_by(BloodPressureAnalysis.created_at.desc()).first()
+    analysis_summary = None
+    if recent_analysis:
+        analysis_json = json.loads(recent_analysis.analysis_text)
+        analysis_summary = analysis_json.get('summary', None)
     
     return render_template('dashboard.html', 
                            name=user.name, 
                            recent_readings=recent_readings, 
                            avg_readings=avg_readings, 
                            total_readings=total_readings,
-                           chart_data=chart_json)
+                           chart_data=chart_json,
+                           analysis_summary=analysis_summary)
 
 # Add this function for server-side validation
 def validate_profile_data(form_data):
@@ -390,7 +403,7 @@ def complete_profile():
             user.profile_completed = True
             user.updated_at = datetime.utcnow()
             db.session.commit()
-            flash('Profile completed successfully!', 'success')
+            flash('Profile updated successfully!', 'success')
             return redirect(url_for('dashboard'))
         else:
             for field, error in errors.items():
@@ -425,6 +438,11 @@ def validate_bp_reading(systolic, diastolic, pulse):
 @app.route('/new_reading', methods=['GET', 'POST'])
 @login_required
 def new_reading():
+    user = User.query.get(session['user_id'])
+    if not user.profile_completed:
+        flash('Please complete your profile before adding a new reading.', 'info')
+        return redirect(url_for('complete_profile'))
+
     if request.method == 'POST':
         try:
             entry_method = request.form['entry_method']
@@ -665,18 +683,16 @@ def export_readings():
             download_name=download_file_name
     )
     
-import random
-from datetime import datetime, timedelta
-
+    
 def generate_random_readings():
     user_id = session['user_id']
     current_date = datetime.now().date()
     readings = []
     
     # Initial values
-    last_systolic = random.randint(110, 125)
+    last_systolic = random.randint(100, 122)
     last_diastolic = random.randint(70, 80)
-    last_pulse = random.randint(60, 75)
+    last_pulse = random.randint(60, 80)
     
     # Trend factors (slight upward or downward trend)
     systolic_trend = random.uniform(-0.1, 0.1)
@@ -746,7 +762,7 @@ def generate_random_readings_route():
     
     return redirect(url_for('dashboard'))
 
-@app.route('/clear_readings', methods=['POST'])
+@app.route('/clear_readings', methods=['POST','GET'])
 @login_required
 def clear_readings():
     user_id = session['user_id']
@@ -759,6 +775,94 @@ def clear_readings():
         db.session.rollback()
         flash(f'An error occurred while clearing your readings: {str(e)}', 'danger')
     return redirect(url_for('dashboard'))
+
+@app.route('/analyze_readings')
+@login_required
+def analyze_readings():
+    user = User.query.get(session['user_id'])
+    if not user.profile_completed:
+        flash('Please complete your profile before doing this.', 'info')
+        return redirect(url_for('complete_profile'))
+
+    readings = BloodPressureReading.query.filter_by(user_id=user.id).order_by(BloodPressureReading.timestamp.desc()).all()
+    
+    if not readings:
+        flash('You need to have at least one reading to perform analysis.', 'warning')
+        return redirect(url_for('dashboard'))
+
+    # Get the current count of readings
+    current_readings_count = len(readings)
+
+    # Check if there's a recent analysis
+    recent_analysis = BloodPressureAnalysis.query.filter_by(user_id=user.id).order_by(BloodPressureAnalysis.created_at.desc()).first()
+    if recent_analysis and recent_analysis.readings_count == current_readings_count:
+        return render_template('analysis_results.html', analysis=json.loads(recent_analysis.analysis_text))
+
+    # Prepare user profile and readings data
+    user_profile = f"""
+    <h5>User Profile:</h5>
+    <p><strong>Name:</strong> {user.name}</p>
+    <p><strong>Gender:</strong> {user.gender}</p>
+    <p><strong>Age:</strong> {datetime.now().year - user.year_of_birth}</p>
+    <p><strong>Height:</strong> {user.height} cm</p>
+    <p><strong>Weight:</strong> {user.weight} kg</p>
+    <p><strong>Occupation:</strong> {user.occupation}</p>
+    <p><strong>Activity Level:</strong> {user.activity_level}</p>
+    """
+
+    readings_data = "<h3>Blood Pressure Readings:</h3><ul>"
+    for reading in readings:
+        readings_data += f"<li>Date: {reading.timestamp}, Systolic: {reading.systolic}, Diastolic: {reading.diastolic}, Pulse: {reading.pulse}</li>"
+    readings_data += "</ul>"
+
+    # Prepare the prompt for Gemini
+    prompt = f"""
+    Analyze the following blood pressure readings and user profile. Provide a comprehensive analysis including:
+    1. High level summary for a non-medical person, easy to understand in one sentence, followed by another sentence with a recommendation on what to do next, if any - json key is summary
+    2. Overall blood pressure trends - json key is overall_blood_pressure_trends
+    3. Identification of any concerning patterns or readings - json key is concerning_patterns
+    4. Recommendations for lifestyle changes or improvements - json key is lifestyle_changes
+    5. Suggestions for follow-up actions (e.g., consult a doctor, increase monitoring frequency) - json key is follow_up_actions
+    6. Any other relevant observations or insights - json key is other_insights
+    
+
+    {user_profile}
+
+    {readings_data}
+
+    Please provide your analysis in a json object and in the json object please include the json keys as the headers and the values as properly formatted  HTML format, using appropriate tags, paragraphs, and lists. Use <strong> tags to highlight important points. No headers for the sections.
+    
+    """
+
+    try:
+        # Generate content using Gemini
+        response = model.generate_content(prompt)
+        
+        json_response = response.text.replace('```json', '').replace('```', '').strip()
+        
+        # Attempt to parse the response as JSON
+
+        try:
+            analysis_json = json.loads(json_response)
+        except json.JSONDecodeError:
+            flash('The analysis response is not in the expected format. Please try again later', 'danger')
+            return redirect(url_for('dashboard'))
+        
+        # Store the analysis in the database
+        new_analysis = BloodPressureAnalysis(user_id=user.id, analysis_text=json.dumps(analysis_json), readings_count=current_readings_count)
+        db.session.add(new_analysis)
+        db.session.commit()
+
+        return render_template('analysis_results.html', analysis=analysis_json)
+    except Exception as e:
+        flash(f'An error occurred during analysis: {str(e)}', 'danger')
+        return redirect(url_for('dashboard'))
+
+# Add this custom filter definition before the route definitions
+@app.template_filter('nl2br')
+def nl2br_filter(s):
+    return s;
+    return escape(s).replace('\n', '<br>\n')
 
 # Initialize database
 if __name__ == "__main__":

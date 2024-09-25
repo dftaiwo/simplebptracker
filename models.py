@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from sqlalchemy import Column, Integer
 
 db = SQLAlchemy()
 
@@ -46,3 +47,15 @@ class User(db.Model):
 def __repr__(self):
         return f'<BloodPressureReading {self.systolic}/{self.diastolic}>'
 
+class BloodPressureAnalysis(db.Model):
+    __tablename__ = 'blood_pressure_analysis'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, db.ForeignKey('user.id'), nullable=False)
+    analysis_text = Column(db.Text, nullable=False)
+    created_at = Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    readings_count = Column(Integer, nullable=False, default=0)  # New column to store the count of readings
+
+    user = db.relationship('User', backref=db.backref('analyses', lazy=True))
+
+    def __repr__(self):
+        return f'<BloodPressureAnalysis {self.id} for user {self.user_id}>'
