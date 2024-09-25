@@ -308,6 +308,9 @@ def dashboard():
         BloodPressureReading.timestamp >= thirty_days_ago
     ).first()
     
+
+    
+
     # Prepare data for the chart
     chart_data = db.session.query(
         func.date(BloodPressureReading.timestamp).label('date'),
@@ -317,8 +320,6 @@ def dashboard():
         BloodPressureReading.user_id == user.id,
         BloodPressureReading.timestamp >= thirty_days_ago
     ).group_by(func.date(BloodPressureReading.timestamp)).order_by('date').all()
-
-    # print([(entry.date, type(entry.date)) for entry in chart_data])
 
     dates = [entry.date if isinstance(entry.date, str) else entry.date.strftime('%Y-%m-%d') for entry in chart_data]
     systolic_data = [float(entry.avg_systolic) for entry in chart_data]
@@ -330,12 +331,20 @@ def dashboard():
         'diastolic': diastolic_data
     })
     
+    # Fetch the latest analysis summary if it exists
+    recent_analysis = BloodPressureAnalysis.query.filter_by(user_id=user.id).order_by(BloodPressureAnalysis.created_at.desc()).first()
+    analysis_summary = None
+    if recent_analysis:
+        analysis_json = json.loads(recent_analysis.analysis_text)
+        analysis_summary = analysis_json.get('summary', None)
+    
     return render_template('dashboard.html', 
                            name=user.name, 
                            recent_readings=recent_readings, 
                            avg_readings=avg_readings, 
                            total_readings=total_readings,
-                           chart_data=chart_json)
+                           chart_data=chart_json,
+                           analysis_summary=analysis_summary)
 
 # Add this function for server-side validation
 def validate_profile_data(form_data):

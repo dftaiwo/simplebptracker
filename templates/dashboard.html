@@ -84,6 +84,17 @@
                     
                     <h5>Statistics</h5>
                     <p>Total Readings: {{ total_readings }}</p>
+                    {% if recent_readings %}
+                    <div id="analysis_summary">
+                        <strong>Recent Analysis</strong><br />
+                        {% if analysis_summary %}
+                        {{ analysis_summary|safe }}
+                        <br />
+                        {% endif %}
+                        
+                        <a href="{{ url_for('analyze_readings') }}">More Details</a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             </div>
