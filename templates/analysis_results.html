@@ -2,9 +2,11 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="header">Analysis Results by Gemini AI</div>
+
+    
     <div class="row">
-        <div class="col-md-12" id="analysis-content">
+        <div class="col-md-8" id="analysis-content">
+            <div class="header">Analysis Results by Gemini AI</div>
             {% for key, value in analysis.items() %}
             <div class="card mb-3">
                 <div class="card-header">
@@ -50,4 +52,5 @@
         </div>
     </div>
 </div>
+&nbsp;
 {% endblock %}

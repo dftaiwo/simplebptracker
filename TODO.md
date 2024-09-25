@@ -3,8 +3,8 @@
 ## High Priority
 - [x] Implement user authentication system using magic links
 - [x] Create a dashboard with basic user statistics
-- [ ] Implement user profile completion and editing functionality
-- [ ] Analyze the data using AI and add more insights to the dashboard
+- [x] Implement user profile completion and editing functionality
+- [x] Analyze the data using AI and add more insights to the dashboard
 
 ## Documentation
 - [ ] Create a blog post about the project and the tech stack
@@ -15,7 +15,7 @@
 - [x] Create a page to view all readings
 - [x] Implement data export functionality
 - [ ] Create a dashboard with more detailed analytics (e.g., weekly/monthly trends)
-- [ ] Implement a feature to share readings with healthcare providers
+- [x] Implement a feature to share readings with healthcare providers
 - [x] Use an email template instead of plain text
 
 ## Low Priority
@@ -29,7 +29,7 @@
 - [x] Use environment variables for configuration
 - [ ] Implement captcha / rate limiting to prevent abuse
 - [ ] Add input sanitization to prevent XSS attacks
-- [ ] Implement CSRF protection on all forms
+- [ ] Implement CSRF protection on all forms (required?)
 - [x] Implement a data generator for quick testing
 
 ## Completed Features
