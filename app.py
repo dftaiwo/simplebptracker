@@ -770,6 +770,9 @@ def clear_readings():
         # Delete all readings for the user
         BloodPressureReading.query.filter_by(user_id=user_id).delete()
         db.session.commit()
+        #clear the analysis as well
+        BloodPressureAnalysis.query.filter_by(user_id=user_id).delete()
+        db.session.commit()
         flash('All your readings have been cleared successfully.', 'success')
     except Exception as e:
         db.session.rollback()
@@ -820,10 +823,11 @@ def analyze_readings():
     Analyze the following blood pressure readings and user profile. Provide a comprehensive analysis including:
     1. High level summary for a non-medical person, easy to understand in one sentence, followed by another sentence with a recommendation on what to do next, if any - json key is summary
     2. Overall blood pressure trends - json key is overall_blood_pressure_trends
-    3. Identification of any concerning patterns or readings - json key is concerning_patterns
-    4. Recommendations for lifestyle changes or improvements - json key is lifestyle_changes
-    5. Suggestions for follow-up actions (e.g., consult a doctor, increase monitoring frequency) - json key is follow_up_actions
-    6. Any other relevant observations or insights - json key is other_insights
+    3. Overall pulse trends, including average pulse, minimum pulse, maximum pulse, pulse variability (standard deviation), and trend - json key is overall_pulse_trends
+    4. Identification of any concerning patterns or readings - json key is concerning_patterns
+    5. Recommendations for lifestyle changes or improvements - json key is lifestyle_changes
+    6. Suggestions for follow-up actions (e.g., consult a doctor, increase monitoring frequency) - json key is follow_up_actions
+    7. Any other relevant observations or insights - json key is other_insights
     
 
     {user_profile}

@@ -49,3 +49,12 @@ h5{
     color: #777;
     display:block;
 }
+
+
+#analysis-content{
+    line-height: 1.6;
+    color:#000;
+}
+#analysis-content li{
+    margin-bottom: 10px;
+}
