@@ -52,7 +52,7 @@ app = Flask(__name__)
 app.config['APP_NAME'] = os.getenv('APP_NAME', 'Simple BP Tracker')
 
 # Configuration for SQLite database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bp_tracker.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI', 'sqlite:///bp_tracker.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Configuration for SMTP (Mail) service
@@ -66,8 +66,8 @@ app.config['GEMINI_API_KEY'] = os.getenv('GEMINI_API_KEY')
 
 
 # Upload folder configuration
-UPLOAD_FOLDER = 'static/uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER','static/uploads')
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 
@@ -384,6 +384,7 @@ def validate_profile_data(form_data):
 
     return errors
 
+
 @app.route('/complete_profile', methods=['GET', 'POST'])
 @login_required
 def complete_profile():
@@ -490,6 +491,10 @@ def new_reading():
                         return redirect(request.url)
                     
                     unique_filename = f"{session['user_id']}_{uuid.uuid4().hex}{file_extension}"
+                    
+                    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                            os.makedirs(app.config['UPLOAD_FOLDER'])
+                    
                     file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
                     
                     # Save and resize the image if necessary
