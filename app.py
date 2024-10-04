@@ -808,23 +808,25 @@ def analyze_readings():
 
     # Prepare user profile and readings data
     user_profile = f"""
-    <h5>User Profile:</h5>
-    <p><strong>Name:</strong> {user.name}</p>
-    <p><strong>Gender:</strong> {user.gender}</p>
-    <p><strong>Age:</strong> {datetime.now().year - user.year_of_birth}</p>
-    <p><strong>Height:</strong> {user.height} cm</p>
-    <p><strong>Weight:</strong> {user.weight} kg</p>
-    <p><strong>Occupation:</strong> {user.occupation}</p>
-    <p><strong>Activity Level:</strong> {user.activity_level}</p>
+    
+## User Profile
+Name: {user.name}
+Gender {user.gender}
+Age {datetime.now().year - user.year_of_birth}
+Height {user.height} cm
+Weight {user.weight} kg
+Occupation {user.occupation}
+Activity Level {user.activity_level}
     """
 
-    readings_data = "<h3>Blood Pressure Readings:</h3><ul>"
+    readings_data = "## Blood Pressure Readings:\n"
     for reading in readings:
-        readings_data += f"<li>Date: {reading.timestamp}, Systolic: {reading.systolic}, Diastolic: {reading.diastolic}, Pulse: {reading.pulse}</li>"
-    readings_data += "</ul>"
+        readings_data += f"\nDate: {reading.timestamp}, Systolic: {reading.systolic}, Diastolic: {reading.diastolic}, Pulse: {reading.pulse}\n"
+    readings_data += "\n"
 
     # Prepare the prompt for Gemini
     prompt = f"""
+    ## Instructions for Analysis
     Analyze the following blood pressure readings and user profile. Provide a comprehensive analysis including:
     1. High level summary for a non-medical person, easy to understand in one sentence, followed by another sentence with a recommendation on what to do next, if any - json key is summary
     2. Overall blood pressure trends - json key is overall_blood_pressure_trends
@@ -833,7 +835,6 @@ def analyze_readings():
     5. Recommendations for lifestyle changes or improvements - json key is lifestyle_changes
     6. Suggestions for follow-up actions (e.g., consult a doctor, increase monitoring frequency) - json key is follow_up_actions
     7. Any other relevant observations or insights - json key is other_insights
-    
 
     {user_profile}
 
@@ -845,9 +846,14 @@ def analyze_readings():
 
     try:
         # Generate content using Gemini
-        response = model.generate_content(prompt)
+        response = model.generate_content(
+                prompt,
+                generation_config=genai.GenerationConfig(
+                response_mime_type="application/json"
+            ),
+                                          )
         
-        json_response = response.text.replace('```json', '').replace('```', '').strip()
+        json_response = response.text;
         
         # Attempt to parse the response as JSON
 
