@@ -806,7 +806,7 @@ def analyze_readings():
 
     # Check if there's a recent analysis
     recent_analysis = BloodPressureAnalysis.query.filter_by(user_id=user.id).order_by(BloodPressureAnalysis.created_at.desc()).first()
-    if False and recent_analysis and recent_analysis.readings_count == current_readings_count:
+    if recent_analysis and recent_analysis.readings_count == current_readings_count:
         return render_template('analysis_results.html', analysis=json.loads(recent_analysis.analysis_text))
 
     # Prepare user profile and readings data
