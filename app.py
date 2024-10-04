@@ -11,6 +11,9 @@ from email.mime.multipart import MIMEMultipart
 from email.message import EmailMessage
 import random
 from datetime import datetime, timedelta
+import typing_extensions as typing
+
+
 
 
 import os
@@ -592,7 +595,7 @@ def my_readings():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Function to extract blood pressure values from an image using Gemini API
+# Function to extract blood pressure values from an image using Gemini
 def extract_bp_from_image(image_path):
     try:
         # Open the image
@@ -803,51 +806,63 @@ def analyze_readings():
 
     # Check if there's a recent analysis
     recent_analysis = BloodPressureAnalysis.query.filter_by(user_id=user.id).order_by(BloodPressureAnalysis.created_at.desc()).first()
-    if recent_analysis and recent_analysis.readings_count == current_readings_count:
+    if False and recent_analysis and recent_analysis.readings_count == current_readings_count:
         return render_template('analysis_results.html', analysis=json.loads(recent_analysis.analysis_text))
 
     # Prepare user profile and readings data
-    user_profile = f"""
-    <h5>User Profile:</h5>
-    <p><strong>Name:</strong> {user.name}</p>
-    <p><strong>Gender:</strong> {user.gender}</p>
-    <p><strong>Age:</strong> {datetime.now().year - user.year_of_birth}</p>
-    <p><strong>Height:</strong> {user.height} cm</p>
-    <p><strong>Weight:</strong> {user.weight} kg</p>
-    <p><strong>Occupation:</strong> {user.occupation}</p>
-    <p><strong>Activity Level:</strong> {user.activity_level}</p>
+    user_profile = f""" 
+## User Profile
+Name: {user.name}
+Gender {user.gender}
+Age {datetime.now().year - user.year_of_birth}
+Height {user.height} cm
+Weight {user.weight} kg
+Occupation {user.occupation}
+Activity Level {user.activity_level}
     """
 
-    readings_data = "<h3>Blood Pressure Readings:</h3><ul>"
+    readings_data = "## Blood Pressure Readings:\n"
     for reading in readings:
-        readings_data += f"<li>Date: {reading.timestamp}, Systolic: {reading.systolic}, Diastolic: {reading.diastolic}, Pulse: {reading.pulse}</li>"
-    readings_data += "</ul>"
+        readings_data += f"Date: {reading.timestamp}, Systolic: {reading.systolic}, Diastolic: {reading.diastolic}, Pulse: {reading.pulse}\n"
+    readings_data += "\n\n"
 
     # Prepare the prompt for Gemini
     prompt = f"""
+    ## Instructions for Analysis:
     Analyze the following blood pressure readings and user profile. Provide a comprehensive analysis including:
-    1. High level summary for a non-medical person, easy to understand in one sentence, followed by another sentence with a recommendation on what to do next, if any - json key is summary
-    2. Overall blood pressure trends - json key is overall_blood_pressure_trends
-    3. Overall pulse trends, including average pulse, minimum pulse, maximum pulse, pulse variability (standard deviation), and trend - json key is overall_pulse_trends
-    4. Identification of any concerning patterns or readings - json key is concerning_patterns
-    5. Recommendations for lifestyle changes or improvements - json key is lifestyle_changes
-    6. Suggestions for follow-up actions (e.g., consult a doctor, increase monitoring frequency) - json key is follow_up_actions
-    7. Any other relevant observations or insights - json key is other_insights
+    High level summary for a non-medical person, easy to understand in one sentence, followed by another sentence with a recommendation on what to do next, if any
+    Overall blood pressure trends
+    Overall pulse trends, including average pulse, minimum pulse, maximum pulse, pulse variability (standard deviation), and trend
+     Identification of any concerning patterns or readings
+    Recommendations for lifestyle changes or improvements
+    Suggestions for follow-up actions (e.g., consult a doctor, increase monitoring frequency)
+    Any other relevant observations or insights 
     
-
     {user_profile}
 
     {readings_data}
-
-    Please provide your analysis in a json object and in the json object please include the json keys as the headers and the values as properly formatted  HTML format, using appropriate tags, paragraphs, and lists. Use <strong> tags to highlight important points. No headers for the sections.
-    
-    """
+"""
 
     try:
-        # Generate content using Gemini
-        response = model.generate_content(prompt)
+        class AnalysisData(typing.TypedDict):
+            summary: str
+            overall_blood_pressure_trends: str
+            overall_pulse_trends: str
+            concerning_patterns: str
+            lifestyle_changes: str
+            follow_up_actions: str
+            other_insights: str
+       
         
-        json_response = response.text.replace('```json', '').replace('```', '').strip()
+        # Generate content using Gemini
+        response = model.generate_content(prompt,
+                                           generation_config=genai.GenerationConfig(
+                response_mime_type="application/json", response_schema=AnalysisData
+            ),
+                                          
+                                          )
+        # app.logger.info(response.text);
+        json_response = response.text;
         
         # Attempt to parse the response as JSON
 
