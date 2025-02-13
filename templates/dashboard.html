@@ -3,147 +3,237 @@
 {% block title %}{{ config['APP_NAME'] }} - Dashboard{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-            {% if total_readings == 0 %}
-            
-                <div class="col-md-8">
-            
-            <div class="alert  text-dark" role="alert">
-                <h5 class="alert-heading">Welcome to Your Blood Pressure Tracker!</h5>
-                <p>It looks like you haven't added any readings yet. Here's what you can expect:</p>
-                <ul>
-                    <li>Track your blood pressure readings over time</li>
-                    <li>View trends and averages</li>
-                    <li>Get insights into your cardiovascular health</li>
-                </ul>
-                <hr>
-                <p class="mb-0">Ready to get started? Add your first reading now!</p>
-            </div>
-            <a href="{{ url_for('new_reading') }}" class="btn btn-primary">Add Your First Reading</a>
-            <a href="{{ url_for('generate_random_readings_route') }}" class="btn btn-secondary">Generate Sample Data</a>
-            </div>
-            {% else %}
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            Recent Readings
+<div class="container py-4">
+    {% if total_readings == 0 %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="feature-icon bg-primary bg-gradient text-white p-3 rounded-circle mx-auto mb-3">
+                            <i class="fas fa-heartbeat"></i>
                         </div>
-                        <div class="card-body">
-
-                        <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Systolic</th>
-                                <th>Diastolic</th>
-                                <th>Pulse</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for reading in recent_readings %}
-                            <tr>
-                                <td>
-                                    {{ reading.timestamp.strftime('%b %d, %Y') }}
-                                    <small class="text-muted">{{ reading.timestamp.strftime('%I:%M %p') }}</small>
-
-                                </td>
-                                <td>{{ reading.systolic }}</td>
-                                <td>{{ reading.diastolic }}</td>
-                                <td>{{ reading.pulse }}</td>
-                            </tr>
-                            {% endfor %}
-                            
-                        </tbody>
-                        </table>
+                        <h2 class="h3 mb-2">Welcome to Your Blood Pressure Tracker!</h2>
+                        <p class="text-muted">Start monitoring your cardiovascular health today</p>
                     </div>
-                    <div class="card-footer">
-                        <div class="btn-group">
 
-                            <a href="{{ url_for('new_reading') }}" class="btn btn-primary btn-block">Record Reading</a>
-                            <a href="{{ url_for('my_readings') }}" class="btn btn-secondary btn-block">View All Readings</a>
-                        
-                            <a href="{{ url_for('analyze_readings') }}" class="btn btn-info btn-block">View Analysis</a>
-                        </div>
-                    </div>
-                </div>
-                </div>
-                
-                <div class="col-md-6">
-                    <div class="cards">
-                        {% if avg_readings.avg_systolic %}
-                        <div class="card-body">
-                            <div class="card">
-                                <div class="card-body">
-                                  <h5 class="card-title text-center">30-Day Average</h5>
-                                  <div class="row">
-                                    <div class="col-md-4">
-                                      <div class="card mb-3">
-                                        <div class="card-body text-center">
-                                          <h6 class="card-subtitle mb-2 text-muted">Systolic</h6>
-                                          <p class="card-text display-4">{{ avg_readings.avg_systolic|round(1) }}<span class="reading-unit">mmHg</span></p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                      <div class="card mb-3">
-                                        <div class="card-body text-center">
-                                          <h6 class="card-subtitle mb-2 text-muted">Diastolic</h6>
-                                          <p class="card-text display-4">{{ avg_readings.avg_diastolic|round(1) }}<span class="reading-unit">mmHg</span></p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                      <div class="card mb-3">
-                                        <div class="card-body text-center">
-                                          <h6 class="card-subtitle mb-2 text-muted">Pulse</h6>
-                                          <p class="card-text display-4">{{ avg_readings.avg_pulse|round(1) }}<span class="reading-unit">bpm</span></p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <hr>
-                                  {% if recent_readings %}
-                    <div id="analysis_summary">
-                        <strong>Recent Analysis based on {{ total_readings }} readings</strong><br />
-                        {% if analysis_summary %}
-                        {{ analysis_summary|safe|trim }}
-                        {% endif %}
-                        <a href="{{ url_for('analyze_readings') }}">More Details</a>
-                        <br />
-                        &nbsp;
-                    </div>
-                    {% endif %}
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <div class="d-flex">
+                                <i class="fas fa-chart-line text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6>Track Readings</h6>
+                                    <p class="text-muted small mb-0">Monitor your blood pressure over time</p>
                                 </div>
-                                
-                              </div>
-                              {% else %}
-                              <p>No readings in the last 30 days.</p>
-                              {% endif %}
-                    
-                    
-                    
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex">
+                                <i class="fas fa-brain text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6>Get Insights</h6>
+                                    <p class="text-muted small mb-0">View trends and analysis</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex">
+                                <i class="fas fa-file-export text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6>Export Data</h6>
+                                    <p class="text-muted small mb-0">Download your readings anytime</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ url_for('new_reading') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Add Your First Reading
+                        </a>
+                        <a href="{{ url_for('generate_random_readings_route') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-random me-2"></i>Generate Sample Data
+                        </a>
+                    </div>
                 </div>
-            </div>
-            </div>
-            </div>
-            
-            
-           
-        
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <h5>Blood Pressure Trends</h5>
-                <canvas id="bpChart"></canvas>
             </div>
         </div>
-        {% endif %}
     </div>
-        
-        
+    {% else %}
+    <div class="row g-4">
+        <!-- Recent Readings Card -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock text-primary me-2"></i>Recent Readings
+                        </h5>
+                        <div class="btn-group">
+                            <a href="{{ url_for('new_reading') }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus me-2"></i>Add Reading
+                            </a>
+                            <a href="{{ url_for('my_readings') }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-list me-2"></i>View All
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0">Date & Time</th>
+                                    <th class="border-0">Systolic</th>
+                                    <th class="border-0">Diastolic</th>
+                                    <th class="border-0">Pulse</th>
+                                    <th class="border-0">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reading in recent_readings %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-medium">{{ reading.timestamp.strftime('%b %d, %Y') }}</span>
+                                            <small class="text-muted">{{ reading.timestamp.strftime('%I:%M %p') }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="fw-medium">{{ reading.systolic }}</span>
+                                        <small class="text-muted">mmHg</small>
+                                    </td>
+                                    <td>
+                                        <span class="fw-medium">{{ reading.diastolic }}</span>
+                                        <small class="text-muted">mmHg</small>
+                                    </td>
+                                    <td>
+                                        <span class="fw-medium">{{ reading.pulse }}</span>
+                                        <small class="text-muted">bpm</small>
+                                    </td>
+                                    <td>
+                                        {% set status = get_bp_status(reading.systolic, reading.diastolic) %}
+                                        <span class="badge bg-{{ status.color }}">{{ status.label }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Card -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar text-primary me-2"></i>30-Day Average
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if avg_readings.avg_systolic %}
+                    <div class="row g-4">
+                        <div class="col-md-12">
+                            <div class="bg-light rounded p-3 text-center">
+                                <h6 class="text-muted mb-2">Systolic</h6>
+                                <h3 class="mb-0">{{ avg_readings.avg_systolic|round(1) }}
+                                    <small class="text-muted fs-6">mmHg</small>
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="bg-light rounded p-3 text-center">
+                                <h6 class="text-muted mb-2">Diastolic</h6>
+                                <h3 class="mb-0">{{ avg_readings.avg_diastolic|round(1) }}
+                                    <small class="text-muted fs-6">mmHg</small>
+                                </h3>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="bg-light rounded p-3 text-center">
+                                <h6 class="text-muted mb-2">Pulse</h6>
+                                <h3 class="mb-0">{{ avg_readings.avg_pulse|round(1) }}
+                                    <small class="text-muted fs-6">bpm</small>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center mb-0">No readings in the last 30 days.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if analysis_summary %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-brain text-primary me-2"></i>AI Analysis
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="analysis-content">
+                        {{ analysis_summary|safe|trim }}
+                        <div class="text-end mt-3">
+                            <a href="{{ url_for('analyze_readings') }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-chart-line me-2"></i>View Full Analysis
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
     </div>
+
+    <!-- Trends Chart -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line text-primary me-2"></i>Blood Pressure Trends
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="bpChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .feature-icon {
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.025em;
+    }
+    .analysis-content {
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if total_readings > 0 %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 $(document).ready(function() {
@@ -173,6 +263,11 @@ $(document).ready(function() {
         },
         options: {
             responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: false,
@@ -192,4 +287,5 @@ $(document).ready(function() {
     });
 });
 </script>
+{% endif %}
 {% endblock %}

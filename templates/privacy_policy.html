@@ -3,49 +3,152 @@
 {% block title %}Privacy Policy - {{ config['APP_NAME'] }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>Privacy Policy</h1>
-    <p>Last updated: {{ current_date }}</p>
-    
-    <h2>1. Introduction</h2>
-    <p>Welcome to {{ config['APP_NAME'] }}. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data and tell you about your privacy rights and how the law protects you.</p>
-    
-    <h2>2. Data We Collect</h2>
-    <p>We collect and process the following data:</p>
-    <ul>
-        <li>Personal identification information (Name, email address)</li>
-        <li>Health-related data (Blood pressure readings, pulse rate)</li>
-        <li>Profile information (Gender, year of birth, height, weight, occupation, activity level)</li>
-    </ul>
-    
-    <h2>3. How We Use Your Data</h2>
-    <p>We use your data to:</p>
-    <ul>
-        <li>Provide and maintain our service</li>
-        <li>Track and analyze your blood pressure readings</li>
-        <li>Improve our service</li>
-        <li>Communicate with you</li>
-    </ul>
-    
-    <h2>4. Data Security</h2>
-    <p>We implement appropriate technical and organizational measures to protect your personal data against unauthorized or unlawful processing, accidental loss, destruction or damage.</p>
-    
-    <h2>5. Your Rights</h2>
-    <p>You have the right to:</p>
-    <ul>
-        <li>Access your personal data</li>
-        <li>Correct inaccurate personal data</li>
-        <li>Request erasure of your personal data</li>
-        <li>Object to processing of your personal data</li>
-        <li>Request restriction of processing your personal data</li>
-        <li>Request transfer of your personal data</li>
-        <li>Withdraw consent</li>
-    </ul>
-    
-    <h2>6. Changes to This Privacy Policy</h2>
-    <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p>
-    
-    <h2>7. Contact Us</h2>
-    <p>If you have any questions about this Privacy Policy, please contact us at: [Your Contact Information]</p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <div class="feature-icon bg-primary bg-gradient text-white p-3 rounded-circle me-3">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-1">Privacy Policy</h1>
+                    <p class="text-muted mb-0">Last updated: {{ current_date }}</p>
+                </div>
+            </div>
+
+            <!-- Content Cards -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-3">1. Introduction</h2>
+                    <p class="text-muted">Welcome to {{ config['APP_NAME'] }}. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data and tell you about your privacy rights and how the law protects you.</p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-3">2. Data We Collect</h2>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="d-flex">
+                                <i class="fas fa-user-circle text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6>Personal Information</h6>
+                                    <p class="text-muted small mb-0">Name, email address</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex">
+                                <i class="fas fa-heartbeat text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6>Health Data</h6>
+                                    <p class="text-muted small mb-0">Blood pressure readings, pulse rate</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex">
+                                <i class="fas fa-user-tag text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6>Profile Data</h6>
+                                    <p class="text-muted small mb-0">Gender, birth year, height, weight, activity level</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-3">3. How We Use Your Data</h2>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item bg-transparent px-0">
+                            <div class="d-flex">
+                                <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="mb-1">Service Provision</h6>
+                                    <p class="text-muted small mb-0">To provide and maintain our service functionality</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item bg-transparent px-0">
+                            <div class="d-flex">
+                                <i class="fas fa-chart-line text-success me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="mb-1">Analysis</h6>
+                                    <p class="text-muted small mb-0">To track and analyze your blood pressure readings</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item bg-transparent px-0">
+                            <div class="d-flex">
+                                <i class="fas fa-tools text-success me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="mb-1">Service Improvement</h6>
+                                    <p class="text-muted small mb-0">To improve our service based on usage patterns</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-3">4. Your Rights</h2>
+                    <div class="row g-3">
+                        {% for right in ['Access your data', 'Correct your data', 'Delete your data', 'Object to processing', 'Restrict processing', 'Data portability', 'Withdraw consent'] %}
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <i class="fas fa-check text-primary me-2"></i>
+                                <span class="text-muted">{{ right }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h2 class="h5 mb-3">5. Contact Us</h2>
+                    <p class="text-muted mb-0">If you have any questions about this Privacy Policy, please contact us at:</p>
+                    <div class="alert alert-light border mt-3 mb-0">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-envelope text-primary me-3"></i>
+                            <span>[Your Contact Information]</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back to Top Button -->
+            <div class="text-center mt-4">
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-up me-2"></i>Back to Top
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .list-group-item {
+        border: none;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+</style>
 {% endblock %}

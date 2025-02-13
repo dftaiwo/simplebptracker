@@ -276,6 +276,23 @@ def verify_magic_link(token):
         flash('User not found.', 'danger')
         return redirect(url_for('index'))
 
+# Add this helper function near the top of the file, after the imports
+def get_bp_status(systolic, diastolic):
+    """
+    Determine blood pressure status based on systolic and diastolic readings.
+    Returns a dict with color and label for the status badge.
+    """
+    if systolic >= 180 or diastolic >= 120:
+        return {'color': 'danger', 'label': 'Crisis'}
+    elif systolic >= 140 or diastolic >= 90:
+        return {'color': 'warning', 'label': 'High'}
+    elif systolic >= 130 or diastolic >= 80:
+        return {'color': 'info', 'label': 'Elevated'}
+    elif systolic >= 90 and diastolic >= 60:
+        return {'color': 'success', 'label': 'Normal'}
+    else:
+        return {'color': 'secondary', 'label': 'Low'}
+
 # Dashboard route
 @app.route('/dashboard')
 @login_required
@@ -345,7 +362,8 @@ def dashboard():
                            avg_readings=avg_readings, 
                            total_readings=total_readings,
                            chart_data=chart_json,
-                           analysis_summary=analysis_summary)
+                           analysis_summary=analysis_summary,
+                           get_bp_status=get_bp_status)
 
 # Add this function for server-side validation
 def validate_profile_data(form_data):
@@ -581,7 +599,8 @@ def my_readings():
         return render_template('my_readings.html', readings=readings, timestamps=timestamps,
                                systolic_values=systolic_values, diastolic_values=diastolic_values,
                                total_readings=total_readings,
-                               pagination=pagination)
+                               pagination=pagination,
+                               get_bp_status=get_bp_status)
     except Exception as e:
         app.logger.error(f"Error in my_readings: {str(e)}")
         flash(f'An error occurred: {str(e)}', 'danger')
@@ -878,6 +897,8 @@ Activity Level {user.activity_level}
 def nl2br_filter(s):
     return s;
     return escape(s).replace('\n', '<br>\n')
+
+
 
 # Initialize database
 if __name__ == "__main__":

@@ -7,7 +7,7 @@
 - [x] Analyze the data using AI and add more insights to the dashboard
 
 ## Documentation
-- [ ] Create a blog post about the project and the tech stack
+- [x] Create a blog post about the project and the tech stack
 - [ ] Write a contributing guide for potential contributors
 
 ## Medium Priority

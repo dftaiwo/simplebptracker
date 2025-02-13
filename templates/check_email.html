@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Check Your Email - {{ config['APP_NAME'] }}{% endblock %}
+
+{% block content %}
+<div class="container min-vh-75 d-flex align-items-center justify-content-center py-5">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 text-center">
+                <div class="mb-4">
+                    <div class="feature-icon bg-primary bg-gradient text-white p-3 rounded-circle mx-auto mb-3">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <h2 class="h3 mb-2">Check Your Email</h2>
+                    <p class="text-muted mb-0">We've sent a magic link to</p>
+                    <p class="h5 mb-0">{{ email }}</p>
+                </div>
+
+                <div class="alert alert-light border mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-info-circle text-primary me-2"></i>
+                        <span class="fw-bold">Next Steps:</span>
+                    </div>
+                    <ul class="text-start mb-0 small">
+                        <li>Check your email inbox</li>
+                        <li>Click the magic link in the email</li>
+                        <li>You'll be automatically signed in</li>
+                    </ul>
+                </div>
+
+                <div class="d-grid gap-3">
+                    {% if email_provider_url != '#' %}
+                    <a href="{{ email_provider_url }}" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-external-link-alt me-2"></i>Open Email Provider
+                    </a>
+                    {% endif %}
+                    
+                    <button onclick="window.location.reload()" class="btn btn-outline-secondary">
+                        <i class="fas fa-redo me-2"></i>Resend Magic Link
+                    </button>
+                    
+                    <a href="{{ url_for('index') }}" class="btn btn-link text-muted">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="mt-4">
+            <div class="accordion" id="helpAccordion">
+                <div class="accordion-item border-0 shadow-sm">
+                    <h2 class="accordion-header" id="helpHeading">
+                        <button class="accordion-button collapsed bg-light" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#helpContent">
+                            <i class="fas fa-question-circle me-2"></i>Need Help?
+                        </button>
+                    </h2>
+                    <div id="helpContent" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                        <div class="accordion-body">
+                            <p class="mb-2">If you don't see the email:</p>
+                            <ul class="small mb-0">
+                                <li>Check your spam or junk folder</li>
+                                <li>Make sure you entered the correct email address</li>
+                                <li>Try requesting a new magic link</li>
+                                <li>Contact support if the issue persists</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .feature-icon {
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+    }
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(0,0,0,.125);
+    }
+</style>
+{% endblock %}

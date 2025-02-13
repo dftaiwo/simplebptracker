@@ -1,56 +1,110 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div class="container mt-5">
+{% block title %}Analysis Results - {{ config['APP_NAME'] }}{% endblock %}
 
-    
-    <div class="row">
-        <div class="col-md-8" id="analysis-content">
-            <div class="header">Analysis Results by Gemini AI</div>
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10" id="analysis-content">
+            <div class="d-flex align-items-center mb-4">
+                <div class="feature-icon bg-primary bg-gradient text-white p-3 rounded-circle me-3">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h2 class="h3 mb-0">AI Analysis Results</h2>
+            </div>
+
             {% for key, value in analysis.items() %}
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h5 class="card-title">{{ key.replace('_', ' ').title() }}</h5>
+            <div class="card mb-4 analysis-card">
+                <div class="card-header bg-light">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-chart-line me-2 text-primary"></i>
+                        <h5 class="card-title mb-0">{{ key.replace('_', ' ').title() }}</h5>
+                    </div>
                 </div>
                 <div class="card-body">
-                    {{ value|safe }}
+                    <div class="analysis-content">
+                        {{ value|safe }}
+                    </div>
                 </div>
             </div>
             {% endfor %}
-            <div class="mt-3 text-center">
-                <button class="btn btn-primary" onclick="copyAnalysis()">Copy Analysis</button>
-                <button class="btn btn-info" onclick="shareAnalysis()">Share Analysis</button>
-                <a href="{{ url_for('dashboard') }}" class="btn btn-dark">Back to Dashboard</a>
+
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <button class="btn btn-primary" onclick="copyAnalysis()">
+                    <i class="fas fa-copy me-2"></i>Copy Analysis
+                </button>
+                <button class="btn btn-info text-white" onclick="shareAnalysis()">
+                    <i class="fas fa-share-alt me-2"></i>Share Analysis
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
             </div>
-            
-            
-            <script>
-            function copyAnalysis() {
-                const analysisContent = document.getElementById('analysis-content').innerText;
-                navigator.clipboard.writeText(analysisContent).then(() => {
-                    alert('Analysis copied to clipboard!');
-                });
-            }
-            
-            function shareAnalysis() {
-                const analysisContent = document.getElementById('analysis-content').innerText;
-                const shareData = {
-                    title: 'Blood Pressure Analysis',
-                    text: analysisContent,
-                    url: window.location.href
-                };
-                
-                if (navigator.share) {
-                    navigator.share(shareData)
-                        .then(() => console.log('Shared successfully'))
-                        .catch((error) => console.log('Error sharing:', error));
-                } else {
-                    alert('Sharing is not supported on this browser. You can copy the analysis and share it manually.');
-                }
-            }
-            </script>
         </div>
     </div>
 </div>
-&nbsp;
+
+<!-- Toast for copy confirmation -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="copyToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>Analysis copied to clipboard!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .analysis-card {
+        transition: transform 0.2s ease-in-out;
+    }
+    .analysis-card:hover {
+        transform: translateY(-5px);
+    }
+    .analysis-content {
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function copyAnalysis() {
+    const analysisContent = document.getElementById('analysis-content').innerText;
+    navigator.clipboard.writeText(analysisContent).then(() => {
+        const toast = new bootstrap.Toast(document.getElementById('copyToast'));
+        toast.show();
+    });
+}
+
+function shareAnalysis() {
+    const analysisContent = document.getElementById('analysis-content').innerText;
+    const shareData = {
+        title: 'Blood Pressure Analysis',
+        text: analysisContent,
+        url: window.location.href
+    };
+    
+    if (navigator.share) {
+        navigator.share(shareData)
+            .then(() => console.log('Shared successfully'))
+            .catch((error) => console.log('Error sharing:', error));
+    } else {
+        alert('Sharing is not supported on this browser. You can copy the analysis and share it manually.');
+    }
+}
+</script>
 {% endblock %}

@@ -3,40 +3,141 @@
 {% block title %}Terms and Conditions - {{ config['APP_NAME'] }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h3>Terms and Conditions</h3>
-    <p>Last updated: September 16, 2024    </p>
-    
-    <h4>1. Agreement to Terms</h4>
-    <p>By accessing or using {{ config['APP_NAME'] }}, you agree to be bound by these Terms and Conditions and our Privacy Policy.</p>
-    
-    <h4>2. Description of Service</h4>
-    <p>{{ config['APP_NAME'] }} is a blood pressure tracking application that allows users to record and monitor their blood pressure readings over time.</p>
-    
-    <h4>3. User Responsibilities</h4>
-    <p>You are responsible for:</p>
-    <ul>
-        <li>Maintaining the confidentiality of your account</li>
-        <li>Providing accurate and up-to-date information</li>
-        <li>Using the service in compliance with all applicable laws and regulations</li>
-    </ul>
-    
-    <h4>4. Medical Disclaimer</h4>
-    <p>{{ config['APP_NAME'] }} is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.</p>
-    
-    <h4>5. Intellectual Property</h4>
-    <p>The service and its original content, features, and functionality are owned by {{ config['APP_NAME'] }} and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.</p>
-    
-    <h4>6. Termination</h4>
-    <p>We may terminate or suspend your account and bar access to the service immediately, without prior notice or liability, under our sole discretion, for any reason whatsoever and without limitation, including but not limited to a breach of the Terms.</p>
-    
-    <h4>7. Limitation of Liability</h4>
-    <p>In no event shall {{ config['APP_NAME'] }}, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the service.</p>
-    
-    <h4>8. Changes to Terms</h4>
-    <p>We reserve the right to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days' notice prior to any new terms taking effect.</p>
-    
-    <h4>9. Contact Us</h4>
-    <p>If you have any questions about these Terms, please contact us at: [Your Contact Information]</p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <div class="feature-icon bg-primary bg-gradient text-white p-3 rounded-circle me-3">
+                    <i class="fas fa-gavel"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-1">Terms and Conditions</h1>
+                    <p class="text-muted mb-0">Last updated: September 16, 2024</p>
+                </div>
+            </div>
+
+            <!-- Agreement Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-handshake text-primary me-3"></i>
+                        <h2 class="h5 mb-0">1. Agreement to Terms</h2>
+                    </div>
+                    <p class="text-muted">By accessing or using {{ config['APP_NAME'] }}, you agree to be bound by these Terms and Conditions and our Privacy Policy.</p>
+                </div>
+            </div>
+
+            <!-- Service Description Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-info-circle text-primary me-3"></i>
+                        <h2 class="h5 mb-0">2. Description of Service</h2>
+                    </div>
+                    <p class="text-muted">{{ config['APP_NAME'] }} is a blood pressure tracking application that allows users to record and monitor their blood pressure readings over time.</p>
+                </div>
+            </div>
+
+            <!-- User Responsibilities Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-user-shield text-primary me-3"></i>
+                        <h2 class="h5 mb-0">3. User Responsibilities</h2>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item bg-transparent px-0">
+                            <div class="d-flex">
+                                <i class="fas fa-key text-success me-3 mt-1"></i>
+                                <p class="text-muted mb-0">Maintaining the confidentiality of your account</p>
+                            </div>
+                        </div>
+                        <div class="list-group-item bg-transparent px-0">
+                            <div class="d-flex">
+                                <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                                <p class="text-muted mb-0">Providing accurate and up-to-date information</p>
+                            </div>
+                        </div>
+                        <div class="list-group-item bg-transparent px-0">
+                            <div class="d-flex">
+                                <i class="fas fa-balance-scale text-success me-3 mt-1"></i>
+                                <p class="text-muted mb-0">Using the service in compliance with all applicable laws and regulations</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Disclaimer Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-notes-medical text-warning me-3"></i>
+                        <h2 class="h5 mb-0">4. Medical Disclaimer</h2>
+                    </div>
+                    <div class="alert alert-warning border-warning bg-warning bg-opacity-10">
+                        <div class="d-flex">
+                            <i class="fas fa-exclamation-triangle text-warning me-3 mt-1"></i>
+                            <p class="mb-0">{{ config['APP_NAME'] }} is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Intellectual Property Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-copyright text-primary me-3"></i>
+                        <h2 class="h5 mb-0">5. Intellectual Property</h2>
+                    </div>
+                    <p class="text-muted">The service and its original content, features, and functionality are owned by {{ config['APP_NAME'] }} and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.</p>
+                </div>
+            </div>
+
+            <!-- Contact Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-envelope text-primary me-3"></i>
+                        <h2 class="h5 mb-0">6. Contact Us</h2>
+                    </div>
+                    <p class="text-muted mb-0">If you have any questions about these Terms, please contact us at:</p>
+                    <div class="alert alert-light border mt-3 mb-0">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-at text-primary me-3"></i>
+                            <span>[Your Contact Information]</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back to Top Button -->
+            <div class="text-center mt-4">
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-up me-2"></i>Back to Top
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .list-group-item {
+        border: none;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+</style>
 {% endblock %}

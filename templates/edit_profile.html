@@ -1,39 +1,174 @@
 {% extends "base.html" %}
 
+{% block title %}Edit Profile - {{ config['APP_NAME'] }}{% endblock %}
+
 {% block content %}
-<h1>Edit Profile</h1>
-<form method="POST">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" value="{{ user.name }}" required>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="feature-icon bg-success bg-gradient text-white p-3 rounded-circle me-3">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <div>
+                            <h2 class="h3 mb-1">Edit Your Profile</h2>
+                            <p class="text-muted mb-0">Update your personal information</p>
+                        </div>
+                    </div>
 
-    <label for="gender">Gender:</label>
-    <select id="gender" name="gender" required>
-        <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
-        <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
-        <option value="other" {% if user.gender == 'other' %}selected{% endif %}>Other</option>
-    </select>
+                    <form method="POST" id="profile-form" class="needs-validation" novalidate>
+                        <div class="row g-3">
+                            <!-- Name Field -->
+                            <div class="col-12">
+                                <label for="name" class="form-label">Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                           value="{{ user.name }}" required>
+                                    <div class="invalid-feedback">Please provide your name.</div>
+                                </div>
+                            </div>
 
-    <label for="year_of_birth">Year of Birth:</label>
-    <input type="number" id="year_of_birth" name="year_of_birth" value="{{ user.year_of_birth }}" required>
+                            <!-- Gender Field -->
+                            <div class="col-md-6">
+                                <label class="form-label">Gender</label>
+                                <div class="input-group">
+                                    <select class="form-select" id="gender" name="gender" required>
+                                        <option value="male" {% if user.gender == 'male' %}selected{% endif %}>
+                                            <i class="fas fa-mars"></i> Male
+                                        </option>
+                                        <option value="female" {% if user.gender == 'female' %}selected{% endif %}>
+                                            <i class="fas fa-venus"></i> Female
+                                        </option>
+                                        <option value="other" {% if user.gender == 'other' %}selected{% endif %}>
+                                            <i class="fas fa-genderless"></i> Prefer not to say
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
 
-    <label for="height">Height (cm):</label>
-    <input type="number" id="height" name="height" value="{{ user.height }}" step="0.1" required>
+                            <!-- Year of Birth Field -->
+                            <div class="col-md-6">
+                                <label for="year_of_birth" class="form-label">Year of Birth</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                    <input type="number" class="form-control" id="year_of_birth" 
+                                           name="year_of_birth" value="{{ user.year_of_birth }}" 
+                                           min="1900" max="{{ current_year }}" required>
+                                </div>
+                            </div>
 
-    <label for="weight">Weight (kg):</label>
-    <input type="number" id="weight" name="weight" value="{{ user.weight }}" step="0.1" required>
+                            <!-- Height Field -->
+                            <div class="col-md-6">
+                                <label for="height" class="form-label">Height</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-ruler-vertical"></i></span>
+                                    <input type="number" step="0.1" class="form-control" id="height" 
+                                           name="height" value="{{ user.height }}" 
+                                           min="50" max="300" required>
+                                    <span class="input-group-text">cm</span>
+                                </div>
+                            </div>
 
-    <label for="occupation">Occupation:</label>
-    <input type="text" id="occupation" name="occupation" value="{{ user.occupation }}">
+                            <!-- Weight Field -->
+                            <div class="col-md-6">
+                                <label for="weight" class="form-label">Weight</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-weight"></i></span>
+                                    <input type="number" step="0.1" class="form-control" id="weight" 
+                                           name="weight" value="{{ user.weight }}" 
+                                           min="20" max="500" required>
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                            </div>
 
-    <label for="activity_level">Activity Level:</label>
-    <select id="activity_level" name="activity_level" required>
-        <option value="sedentary" {% if user.activity_level == 'sedentary' %}selected{% endif %}>Sedentary</option>
-        <option value="lightly_active" {% if user.activity_level == 'lightly_active' %}selected{% endif %}>Lightly Active</option>
-        <option value="moderately_active" {% if user.activity_level == 'moderately_active' %}selected{% endif %}>Moderately Active</option>
-        <option value="very_active" {% if user.activity_level == 'very_active' %}selected{% endif %}>Very Active</option>
-        <option value="extra_active" {% if user.activity_level == 'extra_active' %}selected{% endif %}>Extra Active</option>
-    </select>
+                            <!-- Occupation Field -->
+                            <div class="col-md-6">
+                                <label for="occupation" class="form-label">Occupation</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                                    <input type="text" class="form-control" id="occupation" 
+                                           name="occupation" value="{{ user.occupation }}">
+                                </div>
+                            </div>
 
-    <button type="submit">Update Profile</button>
-</form>
+                            <!-- Activity Level Field -->
+                            <div class="col-md-6">
+                                <label for="activity_level" class="form-label">Activity Level</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-running"></i></span>
+                                    <select class="form-select" id="activity_level" name="activity_level" required>
+                                        <option value="sedentary" {% if user.activity_level == 'sedentary' %}selected{% endif %}>
+                                            Sedentary
+                                        </option>
+                                        <option value="lightly_active" {% if user.activity_level == 'lightly_active' %}selected{% endif %}>
+                                            Lightly Active
+                                        </option>
+                                        <option value="moderately_active" {% if user.activity_level == 'moderately_active' %}selected{% endif %}>
+                                            Moderately Active
+                                        </option>
+                                        <option value="very_active" {% if user.activity_level == 'very_active' %}selected{% endif %}>
+                                            Very Active
+                                        </option>
+                                        <option value="extra_active" {% if user.activity_level == 'extra_active' %}selected{% endif %}>
+                                            Extra Active
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check me-2"></i>Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .form-control:focus, .form-select:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('profile-form');
+    
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
 {% endblock %}

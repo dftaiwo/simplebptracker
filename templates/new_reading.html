@@ -1,149 +1,276 @@
 {% extends "base.html" %}
 
-{% block title %}Enter New Reading - {{ config['APP_NAME'] }}{% endblock %}
+{% block title %}New Reading - {{ config['APP_NAME'] }}{% endblock %}
 
 {% block content %}
-<div class="row mt-4">
-    
-    <div class="col-lg-6">
-        <div class="card">
-            <div class="card-header">New Blood Pressure Reading</div>
-            <div class="card-body p-3">
-                <form action="{{ url_for('new_reading') }}" method="POST" enctype="multipart/form-data" id="readingForm">
-                    <div class="mb-3">
-                        <label for="entry_method" class="form-label">Choose Entry Method</label>
-                        <select class="form-select" id="entry_method" name="entry_method" required>
-                            <option value="" selected disabled>Select method</option>
-                            <option value="manual">Enter Figures</option>
-                            <option value="image">Upload Photo of Reading</option>
-                        </select>
-                    </div>
-
-                    <div id="manualEntry" style="display:none;">
-                        <div class="mb-3">
-                            <label for="systolic" class="form-label">Systolic (mmHg)</label>
-                            <input type="number" class="form-control" id="systolic" name="systolic" min="60" max="300">
-                            <div class="invalid-feedback">Systolic should be between 60 and 300 mmHg.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="diastolic" class="form-label">Diastolic (mmHg)</label>
-                            <input type="number" class="form-control" id="diastolic" name="diastolic" min="40" max="200">
-                            <div class="invalid-feedback">Diastolic should be between 40 and 200 mmHg.</div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="pulse" class="form-label">Pulse (bpm)</label>
-                            <input type="number" class="form-control" id="pulse" name="pulse" min="30" max="220">
-                            <div class="invalid-feedback">Pulse should be between 30 and 220 bpm.</div>
-                        </div>
-                    </div>
-
-                    <div id="imageUpload" style="display:none;">
-                        <div class="mb-3">
-                            <label for="bp_image" class="form-label">Upload Image</label>
-                            <input class="form-control" type="file" id="bp_image" name="bp_image">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="reading_date" class="form-label">Date and Time of Reading</label>
-                        <input type="datetime-local" class="form-control" id="reading_datetime" name="reading_datetime" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Submit Reading</button>
-                </form>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <div class="feature-icon bg-primary bg-gradient text-white p-3 rounded-circle me-3">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-1">New Blood Pressure Reading</h1>
+                    <p class="text-muted mb-0">Record your latest measurement</p>
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="col-md-1"></div>
-    <div class="col-md-5">
-        <div class="card">
-            <div class="card-header">
-                How It Works
-            </div>
-            <div class="card-body">
-                <h5 class="card-title">Track Your Blood Pressure</h5>
-                <p class="card-text">Our app offers two convenient methods to log your blood pressure readings:</p>
-                <ol>
-                    <li><strong>Manual Entry:</strong> Input your systolic, diastolic, and pulse readings directly.</li>
-                    <li><strong>Photo Upload:</strong> Take a photo of your blood pressure monitor's display, and we'll automatically extract the readings.</li>
-                </ol>
-                <h5 class="card-title mt-3">What to Expect</h5>
-                <ul>
-                    <li>View your blood pressure trends over time</li>
-                    <li>See your 30-day averages</li>
-                    <li>Get insights into your cardiovascular health</li>
-                    <li>Easy-to-read charts and tables</li>
-                </ul>
-                <p class="card-text">Regular tracking can help you and your healthcare provider make informed decisions about your health.</p>
+
+            <div class="row g-4">
+                <!-- Entry Form -->
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <!-- Entry Method Selection -->
+                            <div class="entry-method-selection mb-4">
+                                <label class="form-label fw-bold mb-3">How would you like to enter your reading?</label>
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <input type="radio" class="btn-check" name="entry_method" id="manual_entry" value="manual" checked>
+                                        <label class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center p-3" for="manual_entry">
+                                            <i class="fas fa-keyboard fs-3 mb-2"></i>
+                                            <span>Manual Entry</span>
+                                            <small class="text-muted">Type in the numbers</small>
+                                        </label>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="radio" class="btn-check" name="entry_method" id="image_entry" value="image">
+                                        <label class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center p-3" for="image_entry">
+                                            <i class="fas fa-camera fs-3 mb-2"></i>
+                                            <span>Upload Photo</span>
+                                            <small class="text-muted">Take a picture</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form id="readingForm" action="{{ url_for('new_reading') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                                <input type="hidden" name="entry_method" id="entry_method_input">
+                                
+                                <!-- Manual Entry Section -->
+                                <div id="manualEntry" class="entry-section">
+                                    <div class="row g-4">
+                                        <div class="col-sm-6">
+                                            <div class="reading-input">
+                                                <label class="form-label d-flex justify-content-between">
+                                                    Systolic
+                                                    <small class="text-muted">Normal: 90-140</small>
+                                                </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light">
+                                                        <i class="fas fa-arrow-up text-primary"></i>
+                                                    </span>
+                                                    <input type="number" class="form-control" name="systolic" 
+                                                           placeholder="120" min="60" max="300">
+                                                    <span class="input-group-text">mmHg</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="reading-input">
+                                                <label class="form-label d-flex justify-content-between">
+                                                    Diastolic
+                                                    <small class="text-muted">Normal: 60-90</small>
+                                                </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light">
+                                                        <i class="fas fa-arrow-down text-primary"></i>
+                                                    </span>
+                                                    <input type="number" class="form-control" name="diastolic" 
+                                                           placeholder="80" min="40" max="200">
+                                                    <span class="input-group-text">mmHg</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="reading-input">
+                                                <label class="form-label d-flex justify-content-between">
+                                                    Pulse Rate
+                                                    <small class="text-muted">Normal: 60-100</small>
+                                                </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light">
+                                                        <i class="fas fa-heartbeat text-danger"></i>
+                                                    </span>
+                                                    <input type="number" class="form-control" name="pulse" 
+                                                           placeholder="72" min="30" max="220">
+                                                    <span class="input-group-text">bpm</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="reading-input">
+                                                <label class="form-label">Date & Time</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light">
+                                                        <i class="fas fa-calendar text-primary"></i>
+                                                    </span>
+                                                    <input type="datetime-local" class="form-control" 
+                                                           name="reading_datetime" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Image Upload Section -->
+                                <div id="imageUpload" class="entry-section d-none">
+                                    <div class="text-center p-4 border rounded bg-light">
+                                        <i class="fas fa-camera fs-1 text-primary mb-3"></i>
+                                        <h5 class="mb-3">Upload Photo of Your Reading</h5>
+                                        <input type="file" class="form-control" name="bp_image" 
+                                               accept="image/*" capture="environment">
+                                        <small class="text-muted d-block mt-2">
+                                            Take a clear photo of your blood pressure monitor's display
+                                        </small>
+                                    </div>
+                                    <div id="imagePreview" class="mt-3 text-center d-none">
+                                        <img src="" alt="Preview" class="img-fluid rounded shadow-sm">
+                                    </div>
+                                </div>
+
+                                <div class="d-grid mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save me-2"></i>Save Reading
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instructions Card -->
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h5 class="card-title d-flex align-items-center mb-4">
+                                <i class="fas fa-info-circle text-primary me-2"></i>
+                                How to Take a Reading
+                            </h5>
+                            
+                            <div class="mb-4">
+                                <h6 class="fw-bold text-primary mb-3">Before measuring:</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="d-flex mb-3">
+                                        <i class="fas fa-clock text-primary me-3 mt-1"></i>
+                                        <span>Rest for 5 minutes before taking your reading</span>
+                                    </li>
+                                    <li class="d-flex mb-3">
+                                        <i class="fas fa-chair text-primary me-3 mt-1"></i>
+                                        <span>Sit with your back straight and supported</span>
+                                    </li>
+                                    <li class="d-flex mb-3">
+                                        <i class="fas fa-shoe-prints text-primary me-3 mt-1"></i>
+                                        <span>Keep your feet flat on the floor</span>
+                                    </li>
+                                    <li class="d-flex">
+                                        <i class="fas fa-hand-point-up text-primary me-3 mt-1"></i>
+                                        <span>Place your arm on a flat surface at heart level</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="alert alert-light border">
+                                <div class="d-flex">
+                                    <i class="fas fa-lightbulb text-warning me-3 mt-1"></i>
+                                    <div>
+                                        <h6 class="mb-2">Pro Tip</h6>
+                                        <p class="small mb-0">For most accurate results, take readings at the same time each day.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-check:checked + .btn-outline-primary {
+        background-color: #e8f3ff;
+        border-color: #0d6efd;
+        color: #212529;
+        font-weight: 500;
+    }
+    .reading-input .input-group-text {
+        min-width: 42px;
+    }
+    .entry-method-selection label.btn {
+        min-height: 120px;
+    }
+    .entry-method-selection label.btn:hover {
+        background-color: #f8f9fa;
+    }
+    .entry-method-selection .btn small {
+        opacity: 0.7;
+    }
+    .btn-check:checked + .btn-outline-primary small {
+        opacity: 0.9;
+        color: #495057;
+    }
+</style>
+{% endblock %}
+
 {% block extra_scripts %}
 <script>
-$(document).ready(function() {
-    const $entryMethod = $('#entry_method');
-    const $manualEntry = $('#manualEntry');
-    const $imageUpload = $('#imageUpload');
-    const $form = $('#readingForm');
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('readingForm');
+    const manualEntry = document.getElementById('manualEntry');
+    const imageUpload = document.getElementById('imageUpload');
+    const methodInput = document.getElementById('entry_method_input');
+    
+    // Set current date and time as default
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.querySelector('input[name="reading_datetime"]').value = now.toISOString().slice(0,16);
 
-    $entryMethod.on('change', function() {
-        if (this.value === 'manual') {
-            $manualEntry.show();
-            $imageUpload.hide();
-        } else if (this.value === 'image') {
-            $manualEntry.hide();
-            $imageUpload.show();
+    // Handle entry method selection
+    document.querySelectorAll('input[name="entry_method"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            methodInput.value = this.value;
+            manualEntry.classList.toggle('d-none', this.value !== 'manual');
+            imageUpload.classList.toggle('d-none', this.value !== 'image');
+        });
+    });
+
+    // Set initial method
+    document.querySelector('input[name="entry_method"]:checked').dispatchEvent(new Event('change'));
+
+    // Image preview
+    const imageInput = document.querySelector('input[name="bp_image"]');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    imageInput?.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.querySelector('img').src = e.target.result;
+                imagePreview.classList.remove('d-none');
+            };
+            reader.readAsDataURL(this.files[0]);
         }
     });
 
-    // Set current date and time as default for the datetime input
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    $('#reading_datetime').val(now.toISOString().slice(0,16));
-
     // Form validation
-    $form.on('submit', function(e) {
-        let isValid = true;
-
-        if ($entryMethod.val() === 'manual') {
-            const systolic = parseInt($('#systolic').val());
-            const diastolic = parseInt($('#diastolic').val());
-            const pulse = parseInt($('#pulse').val());
-
-            if (isNaN(systolic) || systolic < 60 || systolic > 300) {
-                $('#systolic').addClass('is-invalid');
-                isValid = false;
-            } else {
-                $('#systolic').removeClass('is-invalid');
-            }
-
-            if (isNaN(diastolic) || diastolic < 40 || diastolic > 200) {
-                $('#diastolic').addClass('is-invalid');
-                isValid = false;
-            } else {
-                $('#diastolic').removeClass('is-invalid');
-            }
-
-            if (isNaN(pulse) || pulse < 30 || pulse > 220) {
-                $('#pulse').addClass('is-invalid');
-                isValid = false;
-            } else {
-                $('#pulse').removeClass('is-invalid');
-            }
-
-            if (systolic <= diastolic) {
-                $('#systolic, #diastolic').addClass('is-invalid');
-                alert('Systolic pressure should be higher than diastolic pressure.');
-                isValid = false;
-            }
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
         }
-
-        if (!isValid) {
-            e.preventDefault();
-        }
+        form.classList.add('was-validated');
     });
 });
 </script>

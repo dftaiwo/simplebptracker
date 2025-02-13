@@ -4,54 +4,113 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8 text-center mb-5">
+            <h1 class="display-4 mb-3">Track Your Blood Pressure</h1>
+            <p class="lead text-muted mb-4">Monitor, analyze, and understand your cardiovascular health with our easy-to-use tracking system.</p>
             
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">About {{ config['APP_NAME'] }}</h5>
-                    <p class="card-text">
-                        {{ config['APP_NAME'] }} is an experimental web application designed to help you monitor and track your blood pressure readings over time and easily log readings, view trends, and gain insights into your cardiovascular health.
-                    </p>
-                    <p class="card-text">
-                        <strong>Please note:</strong> This app is not intended for clinical use. It's a personal project to play around with AI.
-                    </p>
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">What to Expect</h5>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Easy-to-use dashboard with recent readings and statistics</li>
-                        <li class="list-group-item">Add new blood pressure readings manually or by uploading an image</li>
-                        <li class="list-group-item">View all historical readings and export to CSV</li>
-                        <li class="list-group-item">Graphical representation of your blood pressure trends</li>
-                        <li class="list-group-item">30-day average calculations to track your progress</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="text-censter">
-                <h5 class="mb-3">Get Started</h5>
-                <div class="row">
-                <div class="col-lg-5">
-                <form action="{{ url_for('signin') }}" method="post">
-                    <div class="mb-3">
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+            {% if not session.get('user_id') %}
+            <div class="mb-5">
+                <form action="{{ url_for('signin') }}" method="post" class="d-flex justify-content-center gap-2">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <input type="email" class="form-control form-control-lg" id="email" name="email" placeholder="Enter your email" required style="border-radius: 8px 0 0 8px;">
+                            <button type="submit" class="btn btn-primary btn-lg" style="border-radius: 0 8px 8px 0;">Get Started</button>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Sign In / Sign Up</button>
                 </form>
-              </div>
-              </div>
             </div>
+            {% endif %}
+        </div>
+    </div>
 
-            <div class="text-center mt-4">
-                <a href="https://github.com/dftaiwo/blood-pressure-tracker" class="btn btn-link" target="_blank">View Source Code on GitHub</a>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="feature-icon bg-primary bg-gradient text-white p-3 rounded-circle me-3">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Track & Monitor</h5>
+                    </div>
+                    <p class="card-text text-muted">
+                        Easily log your blood pressure readings manually or by uploading a photo. View trends and track your progress over time with intuitive charts and analytics.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="feature-icon bg-success bg-gradient text-white p-3 rounded-circle me-3">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h5 class="card-title mb-0">AI-Powered Insights</h5>
+                    </div>
+                    <p class="card-text text-muted">
+                        Get personalized insights and analysis of your blood pressure trends using advanced AI technology, helping you make informed decisions about your health.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">Key Features</h5>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-mobile-alt text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6>Easy Data Entry</h6>
+                                    <p class="text-muted small">Manual entry or photo upload of readings</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-chart-bar text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6>Visual Analytics</h6>
+                                    <p class="text-muted small">Interactive charts and trend analysis</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-file-export text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6>Data Export</h6>
+                                    <p class="text-muted small">Export your readings to CSV format</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mb-5">
+        <p class="text-muted small">
+            <i class="fas fa-info-circle me-1"></i>
+            This app is an experimental project and not intended for clinical use
+        </p>
+        <a href="https://github.com/dftaiwo/blood-pressure-tracker" class="btn btn-outline-secondary" target="_blank">
+            <i class="fab fa-github me-2"></i>View Source on GitHub
+        </a>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
 
 
