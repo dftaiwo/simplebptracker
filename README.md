@@ -4,10 +4,10 @@ A modern, user-friendly blood pressure tracking app built with Flask and Bootstr
 
 ![Simple BP Tracker Screenshot](static/screenshots/landing.png)
 
-Example of an AI-generated insight:
-```
+**Example of an AI-generated insight:**
+
 "Based on your recent readings and activity patterns, we've noticed your blood pressure tends to be lower on days you exercise in the morning. This pattern suggests that morning exercise might be particularly beneficial for your cardiovascular health. Consider maintaining this routine and gradually increasing duration as your fitness improves."
-```
+
 
 
 ## Features
