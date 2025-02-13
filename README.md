@@ -1,14 +1,20 @@
 # Simple BP Tracker
 
-A modern, user-friendly blood pressure tracking application built with Flask and Bootstrap 5, powered by Google Cloud services.
+A modern, user-friendly blood pressure tracking app built with Flask and Bootstrap 5, powered by Google Cloud services.
 
-![Simple BP Tracker Screenshot](static/images/screenshot.png)
+![Simple BP Tracker Screenshot](static/screenshots/landing.png)
+
+Example of an AI-generated insight:
+```
+"Based on your recent readings and activity patterns, we've noticed your blood pressure tends to be lower on days you exercise in the morning. This pattern suggests that morning exercise might be particularly beneficial for your cardiovascular health. Consider maintaining this routine and gradually increasing duration as your fitness improves."
+```
+
 
 ## Features
 
 - **Easy Data Entry**
   - Manual entry with validation
-  - Photo upload of blood pressure monitor display (with OCR coming soon)
+  - Photo upload of blood pressure monitor display
   - Quick input of systolic, diastolic, and pulse readings
 
 - **AI-Powered Analysis**
@@ -154,7 +160,7 @@ The application will be available at `http://localhost:5000`
 - **Frontend**: Bootstrap 5, JavaScript
 - **Cloud Platform**: Google Cloud Run
 - **AI/ML**: Google Gemini API
-- **Database**: SQLite (with Cloud SQL coming soon)
+- **Database**: SQL
 - **Authentication**: Magic Links (Passwordless)
 - **Charts**: Chart.js
 - **Icons**: Font Awesome
@@ -229,13 +235,13 @@ For support, email dftaiwo@gmail.com or open an issue in the GitHub repository.
 ## Screenshots
 
 ### Dashboard
-![Dashboard](static/images/dashboard.png)
+![Dashboard](static/screenshots/dashboard.png)
 
 ### New Reading
-![New Reading](static/images/new-reading.png)
+![New Reading](static/screenshots/new-reading.png)
 
 ### Analysis
-![Analysis](static/images/analysis.png)
+![Analysis](static/screenshots/analysis.png)
 
 ## Impact & Innovation
 
@@ -276,9 +282,4 @@ The application uses Google's Gemini AI in several ways:
    - Suggests preventive measures based on user patterns
    - Helps users make informed healthcare decisions
    - Suggests optimal measurement times
-
-Example of an AI-generated insight:
-```
-"Based on your recent readings and activity patterns, we've noticed your blood pressure tends to be lower on days you exercise in the morning. This pattern suggests that morning exercise might be particularly beneficial for your cardiovascular health. Consider maintaining this routine and gradually increasing duration as your fitness improves."
-```
 
